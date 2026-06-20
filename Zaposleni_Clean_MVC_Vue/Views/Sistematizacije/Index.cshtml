@@ -1,0 +1,74 @@
+﻿@model List<Sistematizacija>
+
+<div class="container mt-4">
+    <div class="text-danger" asp-validation-summary="All"></div>
+
+    <h3 class="text-center mb-4">Sistematizacije</h3>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Id</th>
+                        <th>OJ_Id</th>
+                        <th>OJ</th>
+                        <th>Naziv OJ</th>
+                        <th>Naziv radnog mesta</th>
+                        <th>Kvalifikacija</th>
+                        <th>Radno iskustvo</th>
+                        <th>Benef. rad. staž</th>
+                        <th>Bodovi</th>
+                        <th>Akcije</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var sistematizacija in Model)
+                    {
+                        <tr>
+                            <td>@sistematizacija.Id</td>
+                            <td>@(sistematizacija.OrganizacionaJedinica.Id != null ? sistematizacija.OrganizacionaJedinica.Id.ToString() : "N/A")</td> <!-- Prikazuje Id zaposlenog ili "N/A" ako je null -->
+                            <td>@sistematizacija.OrganizacionaJedinica.OJ</td>
+                            <td>@sistematizacija.OrganizacionaJedinica.Naziv</td>
+                            <td>@sistematizacija.NazivRadnogMesta</td>
+                            <td>@sistematizacija.Kvalifikacija.Naziv</td>
+                            <td>@sistematizacija.Radno_Iskustvo</td>
+                            <td>@sistematizacija.Beneficirani_Radni_Staz</td>
+                            <td>@sistematizacija.Bodovi</td>
+                            <td>
+                                <a class="btn btn-sm btn-warning" asp-action="UpdateSistematizacija" asp-route-sistematizacijaId="@sistematizacija.Id">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <a class="btn btn-sm btn-danger" asp-action="DeleteSistematizacija" asp-route-sistematizacijaId="@sistematizacija.Id" onclick="return confirm('Da li ste sigurni da želite da obrišete ovu sistematizaciju?');">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="text-center">Nema sistematizacija.</p>
+    }
+
+    <div class="text-center mt-4">
+        <a class="btn btn-primary btn-lg" asp-controller="Sistematizacije" asp-action="AddSistematizacija">
+            <i class="bi bi-plus-lg"></i> Add new sistematizacija
+        </a>
+    </div>
+</div>
+
+<!-- Include Bootstrap Icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css" rel="stylesheet">

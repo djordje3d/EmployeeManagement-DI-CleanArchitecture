@@ -1,0 +1,114 @@
+﻿@page "/grupemestatroskova"
+@rendermode InteractiveServer
+
+@inject IListGrupaMestaTroskaUseCase ListGrupaMestaTroskaUseCase
+@inject IDeleteGrupaMestaTroskaUseCase DeleteGrupaMestaTroskaUseCase
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+<h3 class="mt-4">Lista Grupa mesta troškova</h3>
+
+<button class="btn btn-success mb-3" @onclick="OtvoriDodavanjeGrupeMestaTroskova">➕ Dodaj novu grupu mesta troškova</button>
+
+@if (grupeMestaTroskova is null)
+{
+    <p>🔄 Učitavanje podataka...</p>
+}
+else if (!grupeMestaTroskova.Any())
+{
+    <p class="alert alert-warning">⚠️ Nema dostupnih grupa mesta troškova u bazi.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Grupa mesta troškova</th>
+                <th>Naziv grupe</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var grupaMestaTroskova in grupeMestaTroskova)
+            {
+                <tr>
+                    <td>@grupaMestaTroskova.Id</td>
+                    <td>@grupaMestaTroskova.Grupa</td>
+                    <td>@grupaMestaTroskova.Naziv</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" @onclick="() => IzmeniGrupuMestaTroskova(grupaMestaTroskova.Id)">Izmeni</button>
+                        <button class="btn btn-danger btn-sm ms-2" @onclick="() => ObrisiGrupuMestaTroskova(grupaMestaTroskova.Id)">Obriši</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<GrupaMestaTroskova> grupeMestaTroskova = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        grupeMestaTroskova = (await ListGrupaMestaTroskaUseCase.ExecuteAsync()).ToList();
+    }
+
+    private void OtvoriDodavanjeGrupeMestaTroskova()
+    {
+        Console.WriteLine("Kliknuto dugme za dodavanje grupe mesta troškova.");
+        NavigationManager.NavigateTo("/grupamestatroskova/add");
+    }
+
+    private void IzmeniGrupuMestaTroskova(int kvalifikacijaId)
+    {
+        Console.WriteLine($"Izmeni grupu mesta troškova: {kvalifikacijaId}");
+        NavigationManager.NavigateTo($"/grupamestatroskova/edit/{kvalifikacijaId}");
+    }
+
+    private async Task ObrisiGrupuMestaTroskova(int kvalifikacijaId)
+    {
+        var kvalifikacijaZaBrisanje = grupeMestaTroskova.FirstOrDefault(m => m.Id == kvalifikacijaId);
+
+        if (kvalifikacijaZaBrisanje is null)
+        {
+            Console.WriteLine($"Grupa mesta troškova sa ID-om {kvalifikacijaId} nije pronađeno.");
+            return;
+        }
+
+
+        bool potvrda = await ShowDeleteConfirmation($"❗ Da li ste sigurni da želite da obrišete grupu mesta troškova: {kvalifikacijaZaBrisanje.Naziv}?");
+
+        if (!potvrda)
+        {
+            Console.WriteLine(" Brisanje otkazano.");
+            return;
+        }
+
+        Console.WriteLine($"Obriši grupu mesta troškova: {kvalifikacijaId}");
+
+        try
+        {
+            var uspeh = await DeleteGrupaMestaTroskaUseCase.ExecuteAsync(kvalifikacijaId);
+
+            if (uspeh)
+            {
+                grupeMestaTroskova = (await ListGrupaMestaTroskaUseCase.ExecuteAsync()).ToList();
+                StateHasChanged(); // Osvežava UI samo ako je brisanje uspešno
+                Console.WriteLine("Grupa mesta troškova uspešno obrisano!");
+            }
+            else
+            {
+                Console.WriteLine("Brisanje Grupe mesta troškova nije uspelo!");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Greška pri brisanju kvalifikacije: {ex.Message}");
+        }
+    }
+
+    private async Task<bool> ShowDeleteConfirmation(string message)
+    {
+        return await JSRuntime.InvokeAsync<bool>("confirm", message);
+    }
+}

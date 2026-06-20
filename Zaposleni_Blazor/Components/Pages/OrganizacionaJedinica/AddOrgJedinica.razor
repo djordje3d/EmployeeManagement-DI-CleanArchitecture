@@ -1,0 +1,102 @@
+﻿@page "/orgjedinice/add"
+@rendermode InteractiveServer
+
+@inject ICrudOrganizacionaJedinicaUseCases OrgJedinicaUseCase
+@inject NavigationManager NavigationManager
+
+<h3 class="mt-4">Dodaj novu organizacionu jedinicu</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+<EditForm Model="orgJedinica" OnValidSubmit="Save">
+    <ValidationSummary />
+
+        <div class="container-fluid text-start">
+            <div class="row g-3">
+                <div class="col-12 col-md-1">
+                    <label for="oznaka" class="form-label">Oznaka jedinice</label>
+                    <InputText id="oznaka" class="form-control" @bind-Value="orgJedinica.OJ" placeholder="Unesite oznaku jedinice" />
+                    <ValidationMessage For="@(() => orgJedinica.OJ)" />
+                </div>
+
+                <div class="col-12 col-md-2">
+                    <label for="naziv" class="form-label">Naziv jedinice</label>
+                    <InputText id="naziv" class="form-control" @bind-Value="orgJedinica.Naziv" placeholder="Unesite naziv jedinice" />
+                    <ValidationMessage For="@(() => orgJedinica.Naziv)" />
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <label for="grupa" class="form-label">Grupa mesta troškova</label>
+                    <InputSelect id="grupa" class="form-control" @bind-Value="orgJedinica.GrupaMestaTroskovaId">
+                        <option value="">-- Izaberi grupu troškova --</option>
+                        @foreach (var grupa in listaGrupaMestaTroskova)
+                        {
+                            <option value="@grupa.Id">@grupa.Naziv</option>
+                        }
+                    </InputSelect>
+                <ValidationMessage For="@(() => orgJedinica.GrupaMestaTroskovaId)" />
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary me-2">Sačuvaj izmene</button>
+                    <button type="button" class="btn btn-secondary" @onclick="VratiSeNaListu">Nazad</button>
+                </div>
+            </div>
+        </div>
+</EditForm>
+
+@code {
+    @code {
+        private OrganizacioneJedinice orgJedinica { get; set; } = new();
+        private List<GrupaMestaTroskova> listaGrupaMestaTroskova = new();
+        private string? errorMessage;
+
+        protected override async Task OnInitializedAsync()
+        {
+            try
+            {
+                listaGrupaMestaTroskova = (await OrgJedinicaUseCase.GetAllGrupaMestaTroskovaAsync()).ToList();
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"❌ Greška pri učitavanju grupa mesta troškova: {ex.Message}";
+                Console.WriteLine($"❌ Izuzetak: {ex}");
+            }
+        }
+    }
+
+
+    private async Task Save()
+    {
+        try
+        {
+            var uspeh = await OrgJedinicaUseCase.AddAsync(orgJedinica);
+
+            if (uspeh)
+            {
+                Console.WriteLine($"Uspešno sačuvana jedinica: {orgJedinica.Naziv}");
+                NavigationManager.NavigateTo("/orgjedinice"); // Povratak na listu jedinica
+            }
+            else
+            {
+                errorMessage = "❌ Greška pri čuvanju jedinice. Pokušajte ponovo.";
+                Console.WriteLine("❌ Došlo je do greške pri dodavanju jedinice.");
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"❌ Neočekivana greška: {ex.Message}";
+            Console.WriteLine($"❌ Izuzetak: {ex}");
+        }
+    }
+
+    private void VratiSeNaListu()
+    {
+        NavigationManager.NavigateTo("/orgjedinice");
+    }
+}

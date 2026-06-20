@@ -1,0 +1,95 @@
+﻿    @{
+        ViewData["Title"] = "Vue Mesta";
+    }
+
+    <h2 class="text-center">Vue.js Mesta</h2>
+
+    <div id="app">
+        <v-app>
+            <v-main>
+                <v-container>
+                    <div class="d-flex justify-content-between mb-3">
+                        <v-select v-model="brojPoStranici"
+                                  :items="[3,4,5,10]"
+                                  label="Prikaži po"
+                                  style="max-width: 120px"
+                                  dense></v-select>
+
+                        <v-btn color="primary" v-on:click="prikaziModal">Dodaj novo mesto</v-btn>
+                    </div>
+
+                    <v-data-table :headers="headers"
+                                  :items="mestaZaPrikaz"
+                                  :sort-by="sortKey"
+                                  :sort-desc="!sortAsc"
+                                  class="elevation-1"
+                    v-on:update:sort-by="sortKey = $event"
+                    v-on:update:sort-desc="sortAsc = !$event">
+                        <template #item.akcije="{ item }">
+                            <v-btn small color="warning" class="me-1" v-on:click="izmeniMesto(item)">Izmeni</v-btn>
+                            <v-btn small color="error" v-on:click="obrisiMesto(item.id)">Obriši</v-btn>
+                        </template>
+
+                        <template #no-data>
+                            <div class="text-center text-muted">Nema dostupnih mesta za prikaz.</div>
+                        </template>
+                    </v-data-table>
+
+                    <v-pagination v-model="trenutnaStranica"
+                                  :length="ukupnoStranica"
+                                  class="mt-3"
+                                  total-visible="7"></v-pagination>
+
+                    <!-- Modal Dodaj/Izmeni -->
+                    <v-dialog v-model="modalVisible" max-width="600px" persistent>
+                        <v-card>
+                            <v-card-title>
+                                <span class="text-h6">{{ editMode ? 'Izmeni mesto' : 'Dodaj novo mesto' }}</span>
+                                <v-spacer></v-spacer>
+                                <v-btn icon v-on:click="sakrijModal"><v-icon>mdi-close</v-icon></v-btn>
+                            </v-card-title>
+
+                            <v-card-text>
+                                <v-text-field label="Naziv" v-model="novoMesto.naziv" required></v-text-field>
+                                <v-text-field label="Opština" v-model="novoMesto.opstina"></v-text-field>
+                                <v-text-field label="Poštanski broj" v-model="novoMesto.postanskiBroj"></v-text-field>
+                            </v-card-text>
+
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn text v-on:click="sakrijModal">Otkaži</v-btn>
+                                <v-btn color="primary" v-on:click="dodajMesto">{{ editMode ? 'Sačuvaj' : 'Dodaj' }}</v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+
+                    <!-- Modal Potvrda brisanja -->
+                    <v-dialog v-model="confirmDeleteVisible" max-width="400px" persistent>
+                        <v-card color="red lighten-2" dark>
+                            <v-card-title>Potvrda brisanja</v-card-title>
+                            <v-card-text>Da li ste sigurni da želite da obrišete ovo mesto?</v-card-text>
+                            <v-card-actions>
+                                <v-btn text v-on:click="sakrijConfirmDeleteModal">Otkaži</v-btn>
+                                <v-spacer></v-spacer>
+                                <v-btn color="red darken-2" v-on:click="potvrdiBrisanje">Obriši</v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+
+                    <!-- Toast -->
+                    <v-snackbar v-model="toastVisible" :color="toastColor" timeout="3000" top right>
+                        {{ toastPoruka }}
+                        <template #actions>
+                            <v-btn text v-on:click="toastVisible = false">Zatvori</v-btn>
+                        </template>
+                    </v-snackbar>
+                </v-container>
+            </v-main>
+        </v-app>
+    <v-btn color="success">Test dugme</v-btn>
+
+    </div>
+
+    @section Scripts {
+        <script src="~/vue/app.js"></script>
+    }

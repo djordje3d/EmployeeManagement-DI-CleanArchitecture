@@ -1,0 +1,121 @@
+﻿@page "/mesta"
+@rendermode InteractiveServer
+
+@inject IListMestoUseCase ListMestoUseCase
+@inject IDeleteMestoUseCase DeleteMestoUseCase
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+<h3 class="mt-4">Lista Mesta</h3>
+
+<button class="btn btn-success mb-3" @onclick="OtvoriDodavanjeMesta">➕ Dodaj novo mesto</button>
+
+@* <a href="/mesta/add">Testiraj ručno otvaranje Add Mesto stranice</a>
+ *@
+
+@if (mesta is null)
+{
+    <p>🔄 Učitavanje podataka...</p>
+}
+else if (!mesta.Any())
+{
+    <p class="alert alert-warning">⚠️ Nema dostupnih mesta u bazi.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Naziv mesta</th>
+                <th>Naziv opštine</th>
+                <th>Naziv poštanski broj</th>
+                <th>Opcije</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var mesto in mesta)
+            {
+                <tr>
+                    <td>@mesto.Id</td>
+                    <td>@mesto.Naziv</td>
+                    <td>@mesto.Opstina</td>
+                    <td>@mesto.PostanskiBroj</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" @onclick="() => IzmeniMesto(mesto.Id)">Izmeni</button>
+                        <button class="btn btn-danger btn-sm ms-2" @onclick="() => ObrisiMesto(mesto.Id)">Obriši</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Mesto> mesta = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        mesta = (await ListMestoUseCase.ExecuteAsync()).ToList();
+    }
+
+    private void OtvoriDodavanjeMesta()
+    {
+        Console.WriteLine("Kliknuto dugme za dodavanje mesta.");
+        NavigationManager.NavigateTo("/mesta/add");
+    }
+
+    private void IzmeniMesto(int mestoId)
+    {
+        Console.WriteLine($"Izmeni mesto: {mestoId}");
+        NavigationManager.NavigateTo($"/mesta/edit/{mestoId}");
+    }
+
+    private async Task ObrisiMesto(int mestoId)
+    {
+        var mestoZaBrisanje = mesta.FirstOrDefault(m => m.Id == mestoId);
+
+        if (mestoZaBrisanje is null)
+        {
+            Console.WriteLine($"Mesto sa ID-om {mestoId} nije pronađeno.");
+            return;
+        }
+        
+
+        bool potvrda = await ShowDeleteConfirmation($"❗ Da li ste sigurni da želite da obrišete mesto: {mestoZaBrisanje.Naziv}?");
+
+        if (!potvrda)
+        {
+            Console.WriteLine(" Brisanje otkazano.");
+            return;
+        }
+
+        Console.WriteLine($"Obriši mesto: {mestoId}");
+
+        try
+        {
+            var uspeh = await DeleteMestoUseCase.ExecuteAsync(mestoId);
+
+            if (uspeh)
+            {
+                mesta = (await ListMestoUseCase.ExecuteAsync()).ToList();
+                StateHasChanged(); // Osvežava UI samo ako je brisanje uspešno
+                Console.WriteLine("Mesto uspešno obrisano!");
+            }
+            else
+            {
+                Console.WriteLine("Brisanje mesta nije uspelo!");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Greška pri brisanju mesta: {ex.Message}");
+        }
+    }
+    
+    private async Task<bool> ShowDeleteConfirmation(string message)
+    {
+        return await JSRuntime.InvokeAsync<bool>("confirm", message);
+    }
+
+}

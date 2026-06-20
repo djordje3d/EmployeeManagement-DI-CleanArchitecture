@@ -1,0 +1,119 @@
+﻿@model List<UserDto>
+
+<h2>Upravljanje korisnicima</h2>
+
+<!-- Tabela sa korisnicima -->
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Korisničko ime</th>
+            <th>Email</th>
+            <th>Uloge</th>
+            <th>Akcije</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.Id</td>
+                <td>@user.UserName</td>
+                <td>@user.Email</td>
+                <td>
+                    <form asp-action="AssignRolesToUser" method="post" style="display: inline;">
+                        <input type="hidden" name="userId" value="@user.Id" />
+
+                        <div class="form-group">
+                            @foreach (var role in ViewBag.Roles)
+                            {
+                                var isChecked = user.Roles.Contains(role.Name) ? "checked" : "";
+
+                                <!-- Sakrivanje Admin uloge od običnih korisnika -->
+                                @if (role.Name != "Admin" || User.IsInRole("SuperAdmin"))
+                                {
+                                    <div class="form-check">
+                                        <input type="checkbox" name="roles" value="@role.Name" class="form-check-input" id="role_@role.Name" @isChecked>
+                                        <label class="form-check-label" for="role_@role.Name">@role.Name</label>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                        <button type="submit" class="btn btn-success mt-2">Dodeli uloge</button>
+                    </form>
+                </td>
+
+
+
+
+                <td>
+                    <!-- Forma za brisanje korisnika -->
+                    <form asp-action="DeleteUser" method="post" style="display: inline;">
+                        <input type="hidden" name="userId" value="@user.Id" />
+                        <button type="button" class="btn btn-danger delete-user-btn" data-user-name="@user.UserName">Obriši</button>
+                    </form>
+
+                    <!-- Forma za ažuriranje korisnika -->
+                    <form asp-action="UpdateUser" method="post" style="display: inline;">
+                        <input type="hidden" name="UserId" value="@user.Id" />
+                        <input type="text" name="UserName" placeholder="Novo ime" value="@user.UserName" required />
+                        <input type="email" name="Email" placeholder="Novi email" value="@user.Email" required />
+                        <button type="submit" class="btn btn-primary">Ažuriraj</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Prikaz poruka -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<!-- Overlay za loading efekat -->
+<div id="overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999;"></div>
+
+<!-- Skripta za SweetAlert potvrdu brisanja korisnika -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteUserButtons = document.querySelectorAll('.delete-user-btn');
+
+        deleteUserButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const userName = button.getAttribute('data-user-name');
+                const form = button.closest('form');
+
+                Swal.fire({
+                    title: 'Da li ste sigurni?',
+                    text: `Da li želite da obrišete korisnika "${userName}"?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Da, obriši',
+                    cancelButtonText: 'Odustani'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Aktiviraj overlay
+                        document.getElementById('overlay').style.display = 'block';
+
+                        // Aktiviraj spinner na dugmetu
+                        button.disabled = true;
+                        button.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Brisanje...`;
+
+                        // Pošalji formu
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
+</script>

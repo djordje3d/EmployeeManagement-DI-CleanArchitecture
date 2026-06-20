@@ -1,0 +1,142 @@
+﻿@model Sistematizacija
+
+@{
+    ViewData["Title"] = "Add Sistematizacija";
+}
+
+<div class="container mt-4" style="max-width: 50%;">
+    <h3 class="mb-4 text-center">Add New Sistematizacija</h3>
+
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <form method="post" asp-action="AddSistematizacija">
+                <div class="text-danger mb-3" asp-validation-summary="All"></div>
+
+                <!-- Naziv radnog mesta -->
+                <div class="mb-3 row">
+                    <label asp-for="NazivRadnogMesta" class="col-sm-3 col-form-label">Naziv radnog mesta</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="NazivRadnogMesta" class="form-control" placeholder="Unesite naziv radnog mesta" />
+                        <span class="text-danger" asp-validation-for="NazivRadnogMesta"></span>
+                    </div>
+                </div>
+                
+                <!-- OJ -->
+                <div class="mb-3 row">
+                    <label asp-for="OrganizacioneJediniceId" class="col-sm-3 col-form-label">OJ</label>
+                    <div class="col-sm-9">
+                        @Html.DropDownListFor(
+                                 model => model.OrganizacioneJediniceId,
+                                 ViewBag.OrgJedinice as SelectList,
+                                 "Izaberite OJ",
+                                 new { @class = "form-control" })
+                        <span class="text-danger" asp-validation-for="OrganizacioneJediniceId"></span>
+                    </div>
+                </div>
+
+                <!-- Dropdown sa Font Awesome ikonom -->
+                <div class="mb-3 dropdown">
+                    <label asp-for="KvalifikacijaId" class="form-label">Kvalifikacija</label>
+                    <div class="dropdown-container">
+                        @Html.DropDownListFor(
+                                 model => model.KvalifikacijaId,
+                                 ViewBag.Kvalifikacije as SelectList,
+                                 "Izaberite kvalifikaciju",
+                                 new { @class = "form-control" })
+                        <i class="fa fa-caret-down dropdown-icon"></i>
+                    </div>
+                    <span class="text-danger" asp-validation-for="KvalifikacijaId"></span>
+                </div>
+
+                <!-- Koeficijent -->
+                <div class="mb-3 row">
+                    <label asp-for="Koeficijent" class="col-sm-3 col-form-label">Koeficijent</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="Koeficijent" class="form-control" placeholder="Unesite koeficijent" />
+                        <span class="text-danger" asp-validation-for="Koeficijent"></span>
+                    </div>
+                </div>
+
+                <!-- Radno iskustvo -->
+                <div class="mb-3 row">
+                    <label asp-for="Radno_Iskustvo" class="col-sm-3 col-form-label">Radno iskustvo</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="Radno_Iskustvo" class="form-control" placeholder="Unesite radno iskustvo" />
+                        <span class="text-danger" asp-validation-for="Radno_Iskustvo"></span>
+                    </div>
+                </div>
+
+                <!-- Ben. radni staž -->
+                <div class="mb-3 row">
+                    <label asp-for="Beneficirani_Radni_Staz" class="col-sm-3 col-form-label">Ben. radni staž</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="Beneficirani_Radni_Staz" class="form-control" placeholder="Unesite Ben. radni staž" />
+                        <span class="text-danger" asp-validation-for="Beneficirani_Radni_Staz"></span>
+                    </div>
+                </div>
+
+                <!-- Bodovi -->
+                <div class="mb-3 row">
+                    <label asp-for="Bodovi" class="col-sm-3 col-form-label">Bodovi</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="Bodovi" class="form-control" placeholder="Unesite bodovi" />
+                        <span class="text-danger" asp-validation-for="Bodovi"></span>
+                    </div>
+                </div>
+
+                <!-- Opis -->
+                <div class="mb-3 row">
+                    <label asp-for="Opis" class="col-sm-3 col-form-label">Opis</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="Opis" class="form-control" placeholder="Unesite opis" />
+                        <span class="text-danger" asp-validation-for="Opis"></span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mb-3 row">
+                    <div class="col-sm-9 offset-sm-3">
+                        <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                        <button type="button" class="btn btn-secondary btn-block" onclick="indexSistematizacija()" style="margin-left: 10px;">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Stilizacija za dropdown sa Font Awesome ikonama -->
+<style>
+    .dropdown-container {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .dropdown-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 18px;
+        color: #555;
+        pointer-events: none;
+    }
+
+    select {
+        padding-right: 35px; /* Omogućava prostor za ikonu */
+    }
+</style>
+
+<!-- Add Bootstrap validation scripts -->
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        function indexSistematizacija() {
+            window.location.href = '@Url.Action("Index", "Sistematizacije")'
+        }
+    </script>
+}

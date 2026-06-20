@@ -1,0 +1,64 @@
+﻿@model List<Mesto>
+
+<div class="container mt-4">
+    <div class="text-danger" asp-validation-summary="All"></div>
+
+    <h3 class="text-center mb-4">Mesta</h3>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Naziv</th>
+                        <th>Opština</th>
+                        <th>Poštanski broj</th>
+                        <th>Akcije</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var mesto in Model)
+                    {
+                        <tr>
+                            <td>@mesto.Id</td>
+                            <td>@mesto.Naziv</td>
+                            <td>@mesto.Opstina</td>
+                            <td>@mesto.PostanskiBroj</td>
+                            <td>
+                                <a class="btn btn-sm btn-warning" asp-action="UpdateMesto" asp-route-mestoId="@mesto.Id">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <a class="btn btn-sm btn-danger" asp-action="DeleteMesto" asp-route-mestoId="@mesto.Id" onclick="return confirm('Da li ste sigurni da želite da obrišete ovo mesto?');">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="text-center">Nema mesta!</p>
+    }
+
+    <div class="text-center mt-4">
+        <a class="btn btn-primary btn-lg" asp-controller="Mesta" asp-action="AddMesto">
+            <i class="bi bi-plus-lg"></i> Add new Mesto
+        </a>
+    </div>
+</div>
+
+<!-- Include Bootstrap Icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css" rel="stylesheet">

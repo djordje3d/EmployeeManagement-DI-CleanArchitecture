@@ -1,0 +1,64 @@
+﻿@model List<OrganizacioneJedinice>
+
+<div class="container mt-4">
+    <div class="text-danger" asp-validation-summary="All"></div>
+
+    <h3 class="text-center mb-4">OJ</h3>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>OJ</th>
+                        <th>Naziv</th>
+                        <th>Grupa mesta troška</th>
+                        <th>Akcije</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var orgJed in Model)
+                    {
+                        <tr>
+                            <td>@orgJed.Id</td>
+                            <td>@orgJed.OJ</td>
+                            <td>@orgJed.Naziv</td>
+                            <td>@orgJed.GrupaMestaTroskova.Naziv</td>
+                            <td>
+                                <a class="btn btn-sm btn-warning" asp-action="UpdateOrgJedinica" asp-route-orgJedId="@orgJed.Id">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                        <a class="btn btn-sm btn-danger" asp-action="DeleteOrgJedinica" asp-route-orgJedId="@orgJed.Id" onclick="return confirm('Da li ste sigurni da želite da obrišete ovu OJ?');">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="text-center">Nema OJ!</p>
+    }
+
+    <div class="text-center mt-4">
+        <a class="btn btn-primary btn-lg" asp-controller="OrgJedinice" asp-action="AddOrgJedinica">
+            <i class="bi bi-plus-lg"></i> Add new OJ
+        </a>
+    </div>
+</div>
+
+<!-- Include Bootstrap Icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css" rel="stylesheet">

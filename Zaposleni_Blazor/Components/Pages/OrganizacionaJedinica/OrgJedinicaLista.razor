@@ -1,0 +1,116 @@
+﻿@page "/orgjedinice"
+@rendermode InteractiveServer
+
+@inject ICrudOrganizacionaJedinicaUseCases CrudOJUseCases
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+<h3 class="mt-4">Lista Organizacionih Jedinica</h3>
+
+<button class="btn btn-success mb-3" @onclick="OtvoriDodavanjeOJ">➕ Dodaj novu OJ</button>
+
+@if (orgJedinice is null)
+{
+    <p>🔄 Učitavanje podataka...</p>
+}
+else if (!orgJedinice.Any())
+{
+    <p class="alert alert-warning">⚠️ Nema dostupnih organizacionih jedinica u bazi.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Šifra OJ</th>
+                <th>Naziv OJ</th>
+                <th>Grupa mesta troškova</th>
+                <th>Opcije</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var oj in orgJedinice)
+            {
+                <tr>
+                    <td>@oj.Id</td>
+                    <td>@oj.OJ</td>
+                    <td>@oj.Naziv</td>
+                    <td>@oj.GrupaMestaTroskova?.Naziv</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" @onclick="() => IzmeniOJ(oj.Id)">Izmeni</button>
+                        <button class="btn btn-danger btn-sm ms-2" @onclick="() => ObrisiOJ(oj.Id)">Obriši</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<OrganizacioneJedinice> orgJedinice = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        orgJedinice = (await CrudOJUseCases.GetAllAsync()).ToList();
+    }
+
+    private void OtvoriDodavanjeOJ()
+    {
+        Console.WriteLine("Kliknuto dugme za dodavanje OJ.");
+        NavigationManager.NavigateTo("/orgjedinice/add");
+    }
+
+    private void IzmeniOJ(int ojId)
+    {
+        Console.WriteLine($"Izmeni OJ: {ojId}");
+        NavigationManager.NavigateTo($"/orgjedinice/edit/{ojId}");
+    }
+
+    private async Task ObrisiOJ(int ojId)
+    {
+        var orgJedZaBrisanje = orgJedinice.FirstOrDefault(m => m.Id == ojId);
+
+        if (orgJedZaBrisanje is null)
+        {
+            Console.WriteLine($"OJ sa ID-om {ojId} nije pronađeno.");
+            return;
+        }
+
+
+        bool potvrda = await ShowDeleteConfirmation($"❗ Da li ste sigurni da želite da obrišete OrgJed: {orgJedZaBrisanje.Naziv}?");
+
+        if (!potvrda)
+        {
+            Console.WriteLine(" Brisanje otkazano.");
+            return;
+        }
+
+        Console.WriteLine($"Obriši OJ: {ojId}");
+
+        try
+        {
+            var uspeh = await CrudOJUseCases.DeleteAsync(ojId);
+
+            if (uspeh)
+            {
+                orgJedinice = (await CrudOJUseCases.GetAllAsync()).ToList();
+                StateHasChanged(); // Osvežava UI samo ako je brisanje uspešno
+                Console.WriteLine("OJ uspešno obrisana!");
+            }
+            else
+            {
+                Console.WriteLine("Brisanje Org.jedinice nije uspelo!");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Greška pri brisanju OJ: {ex.Message}");
+        }
+    }
+
+    private async Task<bool> ShowDeleteConfirmation(string message)
+    {
+        return await JSRuntime.InvokeAsync<bool>("confirm", message);
+    }
+}

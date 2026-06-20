@@ -1,0 +1,120 @@
+﻿@page "/sistematizacije"
+@rendermode InteractiveServer
+
+@inject ICrudSistematizacijaUseCases CrudSistematizacijaUseCases
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+<h3 class="mt-4">Lista Sistematizacija</h3>
+
+<button class="btn btn-success mb-3" @onclick="OtvoriDodavanjeSistematizacije">➕ Dodaj novu Sistematizaciju</button>
+
+@if (sistematizacije is null)
+{
+    <p>🔄 Učitavanje podataka...</p>
+}
+else if (!sistematizacije.Any())
+{
+    <p class="alert alert-warning">⚠️ Nema dostupnih sistematizacija u bazi.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Naziv radnog mesta</th>
+                <th>Koeficijent</th>
+                <th>Radno iskustvo</th>
+                <th>Organizaciona jedinica</th>
+                <th>Kvalifikacija</th>
+                <th>Opcije</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sistematizacija in sistematizacije)
+            {
+                <tr>
+                    <td>@sistematizacija.Id</td>
+                    <td>@sistematizacija.NazivRadnogMesta</td>
+                    <td>@sistematizacija.Koeficijent</td>
+                    <td>@sistematizacija.Radno_Iskustvo</td>
+                    <td>@sistematizacija.OrganizacionaJedinica?.Naziv</td>
+                    <td>@sistematizacija.Kvalifikacija?.Naziv</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" @onclick="() => IzmeniSistematizaciju(sistematizacija.Id)">Izmeni</button>
+                        <button class="btn btn-danger btn-sm ms-2" @onclick="() => ObrisiSistematizaciju(sistematizacija.Id)">Obriši</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Sistematizacija> sistematizacije = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        sistematizacije = (await CrudSistematizacijaUseCases.GetAllAsync()).ToList();
+    }
+
+    private void OtvoriDodavanjeSistematizacije()
+    {
+        Console.WriteLine("Kliknuto dugme za dodavanje Sistematizacije.");
+        NavigationManager.NavigateTo("/sistematizacija/add");
+    }
+
+    private void IzmeniSistematizaciju(int sistematizacijaId)
+    {
+        Console.WriteLine($"Izmeni sistematizaciju: {sistematizacijaId}");
+        NavigationManager.NavigateTo($"/sistematizacija/edit/{sistematizacijaId}");
+    }
+
+    private async Task ObrisiSistematizaciju(int sistematizacijaId)
+    {
+        var sistematizacijaZaBrisanje = sistematizacije.FirstOrDefault(m => m.Id == sistematizacijaId);
+
+        if (sistematizacijaZaBrisanje is null)
+        {
+            Console.WriteLine($"Sistematizacija sa ID-om {sistematizacijaId} nije pronađena.");
+            return;
+        }
+
+
+        bool potvrda = await ShowDeleteConfirmation($"❗ Da li ste sigurni da želite da obrišete sistematizaciju: {sistematizacijaZaBrisanje.NazivRadnogMesta}?");
+
+        if (!potvrda)
+        {
+            Console.WriteLine(" Brisanje otkazano.");
+            return;
+        }
+
+        Console.WriteLine($"Obriši Sistematizaciju: {sistematizacijaId}");
+
+        try
+        {
+            var uspeh = await CrudSistematizacijaUseCases.DeleteAsync(sistematizacijaId);
+
+            if (uspeh)
+            {
+                sistematizacije = (await CrudSistematizacijaUseCases.GetAllAsync()).ToList();
+                StateHasChanged(); // Osvežava UI samo ako je brisanje uspešno
+                Console.WriteLine("Sistematizacija uspešno obrisana!");
+            }
+            else
+            {
+                Console.WriteLine("Brisanje Sistematizacije nije uspelo!");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Greška pri brisanju Sistematizacije: {ex.Message}");
+        }
+    }
+
+    private async Task<bool> ShowDeleteConfirmation(string message)
+    {
+        return await JSRuntime.InvokeAsync<bool>("confirm", message);
+    }
+}

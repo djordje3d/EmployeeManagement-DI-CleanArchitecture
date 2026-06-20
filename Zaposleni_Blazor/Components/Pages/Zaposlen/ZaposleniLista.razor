@@ -1,0 +1,122 @@
+﻿@page "/zaposleni"
+@rendermode InteractiveServer
+
+@inject  ICrudZaposlenUseCases CrudZaposlenUseCases
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+<h3 class="mt-4">Lista Zaposlenih</h3>
+
+<button class="btn btn-success mb-3" @onclick="OtvoriDodavanjeZaposlenog">➕ Dodaj novog Zaposlenog</button>
+
+@if (zaposleni is null)
+{
+    <p>🔄 Učitavanje podataka...</p>
+}
+else if (!zaposleni.Any())
+{
+    <p class="alert alert-warning">⚠️ Nema dostupnih zaposlenih u bazi.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Ime</th>
+                <th>Prezime</th>
+                <th>Datum rođenja</th>
+                <th>JMBG</th>
+                <th>Mesto</th>
+                <th>Stepen kvalifikacije</th>
+                <th>Opcije</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var zaposlen in zaposleni)
+            {
+                <tr>
+                    <td>@zaposlen.Id</td>
+                    <td>@zaposlen.Ime</td>
+                    <td>@zaposlen.Prezime</td>
+                    <td>@zaposlen.DatumRodjenja.ToString("dd.MM.yyyy.")</td>
+                    <td>@zaposlen.JMBG</td>
+                    <td>@zaposlen.Mesto?.Naziv</td>
+                    <td>@zaposlen.Kvalifikacija?.Naziv</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" @onclick="() => IzmeniZaposlenog(zaposlen.Id)">Izmeni</button>
+                        <button class="btn btn-danger btn-sm ms-2" @onclick="() => ObrisiZaposlenog(zaposlen.Id)">Obriši</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Zaposlen> zaposleni = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        zaposleni = (await CrudZaposlenUseCases.GetAllAsync()).ToList();
+    }
+
+    private void OtvoriDodavanjeZaposlenog()
+    {
+        Console.WriteLine("Kliknuto dugme za dodavanje Zaposlenog.");
+        NavigationManager.NavigateTo("/zaposlen/add");
+    }
+
+    private void IzmeniZaposlenog(int zaposlenId)
+    {
+        Console.WriteLine($"Izmeni zaposlenog: {zaposlenId}");
+        NavigationManager.NavigateTo($"/zaposlen/edit/{zaposlenId}");
+    }
+
+    private async Task ObrisiZaposlenog(int zaposlenId)
+    {
+        var zaposlenZaBrisanje = zaposleni.FirstOrDefault(m => m.Id == zaposlenId);
+
+        if (zaposlenZaBrisanje is null)
+        {
+            Console.WriteLine($"Sistematizacija sa ID-om {zaposlenId} nije pronađena.");
+            return;
+        }
+
+
+        bool potvrda = await ShowDeleteConfirmation($"❗ Da li ste sigurni da želite da obrišete zaposlenog: {zaposlenZaBrisanje.Ime + " " + zaposlenZaBrisanje.Prezime}?");
+
+        if (!potvrda)
+        {
+            Console.WriteLine(" Brisanje otkazano.");
+            return;
+        }
+
+        Console.WriteLine($"Obriši Zaposlenog: {zaposlenId}");
+
+        try
+        {
+            var uspeh = await CrudZaposlenUseCases.DeleteAsync(zaposlenId);
+
+            if (uspeh)
+            {
+                zaposleni = (await CrudZaposlenUseCases.GetAllAsync()).ToList();
+                StateHasChanged(); // Osvežava UI samo ako je brisanje uspešno
+                Console.WriteLine("Zaposleni uspešno obrisan!");
+            }
+            else
+            {
+                Console.WriteLine("Brisanje Zaposlenog nije uspelo!");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Greška pri brisanju Zaposlenog: {ex.Message}");
+        }
+    }
+
+    private async Task<bool> ShowDeleteConfirmation(string message)
+    {
+        return await JSRuntime.InvokeAsync<bool>("confirm", message);
+    }
+}

@@ -1,0 +1,45 @@
+﻿@model Kvalifikacija
+
+<div class="container mt-4" style="max-width: 50%;">
+    <h3 class="text-center mb-4">Dodaj novu kvalifikaciju</h3>
+
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <form method="post" asp-action="AddKvalifikacija">
+                <div class="text-danger mb-3" asp-validation-summary="All"></div>
+
+                <!-- Licni Stepen Kv -->
+                <div class="mb-3 row">
+                    <label asp-for="LicniStepenKv" class="col-sm-3 col-form-label">Lični Stepen Kv</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="LicniStepenKv" class="form-control" placeholder="Unesite lični stepen kvalifikacije" />
+                        <span class="text-danger" asp-validation-for="LicniStepenKv"></span>
+                    </div>
+                </div>
+
+                <!-- Naziv -->
+                <div class="mb-3 row">
+                    <label asp-for="Naziv" class="col-sm-3 col-form-label">Naziv</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="Naziv" class="form-control" placeholder="Unesite naziv kvalifikacije" />
+                        <span class="text-danger" asp-validation-for="Naziv"></span>
+                    </div>
+                </div>
+
+                <!-- Submit and Cancel Buttons -->
+                <div class="mb-3 row">
+                    <div class="col-sm-9 offset-sm-3">
+                        <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                        <button type="button" class="btn btn-secondary btn-block" onclick="window.location.href='@Url.Action("Index", "Kvalifikacije")'">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

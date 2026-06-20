@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Zaposleni.Plugins.EFCoreSqlServer\Zaposleni.Plugins.EFCoreSqlServer.csproj" />
+    <ProjectReference Include="..\Zaposleni_Blazor.CoreBusiness\Zaposleni_Blazor.CoreBusiness.csproj" />
+    <ProjectReference Include="..\Zaposleni_Blazor.UseCases\Zaposleni_Blazor.UseCases.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\" />
+    <Folder Include="Models\" />
+  </ItemGroup>
+
+</Project>

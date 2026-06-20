@@ -1,0 +1,54 @@
+﻿@model Mesto
+
+<div class="container mt-4" style="max-width: 50%;">
+    <h3 class="text-center mb-4">Dodaj novo mesto</h3>
+
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <form method="post" asp-action="AddMesto">
+                <div class="text-danger mb-3" asp-validation-summary="All"></div>
+
+                <!-- Naziv -->
+                <div class="mb-3 row">
+                    <label asp-for="Naziv" class="col-sm-3 col-form-label">Naziv mesta</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="Naziv" class="form-control" placeholder="Unesite naziv mesta" />
+                        <span class="text-danger" asp-validation-for="Naziv"></span>
+                    </div>
+                </div>
+
+                <!-- Opština -->
+                <div class="mb-3 row">
+                    <label asp-for="Opstina" class="col-sm-3 col-form-label">Naziv opštine</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="Opstina" class="form-control" placeholder="Unesite naziv opštine" />
+                        <span class="text-danger" asp-validation-for="Opstina"></span>
+                    </div>
+                </div>
+
+                <!-- Poštanski broj -->
+                <div class="mb-3 row">
+                    <label asp-for="PostanskiBroj" class="col-sm-3 col-form-label">Poštanski broj</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="PostanskiBroj" class="form-control" placeholder="Unesite poštanski broj" />
+                        <span class="text-danger" asp-validation-for="PostanskiBroj"></span>
+                    </div>
+                </div>
+
+                <!-- Submit and Cancel Buttons -->
+                <div class="mb-3 row">
+                    <div class="col-sm-9 offset-sm-3">
+                        <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                        <button type="button" class="btn btn-secondary btn-block" onclick="window.location.href='@Url.Action("Index", "Mesta")'">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

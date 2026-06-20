@@ -1,0 +1,44 @@
+﻿@model LoginViewModel
+
+<!-- Modal struktura za Login -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginModalLabel">Login</h5>
+            </div>
+            <div class="modal-body">
+                <p>Nemate nalog? <a asp-action="Register">Registrujte se</a></p>
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+                }
+
+                <form asp-action="Login" method="post">
+                    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+                    <div class="form-group">
+                        <label for="Username">Username</label>
+                        <input type="text" id="Username" name="Username" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="Password">Password</label>
+                        <input type="password" id="Password" name="Password" class="form-control" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript za automatsko prikazivanje modala -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var loginModal = new bootstrap.Modal(document.getElementById('loginModal'), {
+            backdrop: 'static', // Sprečava zatvaranje klikom na pozadinu
+            keyboard: false     // Sprečava zatvaranje pritiskom na ESC
+        });
+        loginModal.show(); // Prikazuje modal
+    });
+</script>

@@ -1,0 +1,66 @@
+﻿@model List<Zaposlen>
+
+<div class="container mt-4">
+    <div class="text-danger" asp-validation-summary="All"></div>
+
+    <h3 class="text-center mb-4">Zaposleni</h3>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Ime</th>
+                        <th>Prezime</th>
+                        <th>Datum rođenja</th>
+                        <th>JMBG</th>
+                        <th>Mesto</th>
+                        <th>Akcije</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var zaposlen in Model)
+                    {
+                        <tr>
+                            <td>@zaposlen.Ime</td>
+                            <td>@zaposlen.Prezime</td>
+                            <td>@zaposlen.DatumRodjenja.ToString("dd.MM.yyyy")</td>
+                            <td>@zaposlen.JMBG</td>
+                            <td>@(zaposlen.Mesto?.Naziv ?? "N/A")</td> <!-- Prikazuje naziv mesta ili "N/A" ako je null -->
+                            <td>
+                                <a class="btn btn-sm btn-warning" asp-action="UpdateZaposleni" asp-route-zaposlenId="@zaposlen.Id">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <a class="btn btn-sm btn-danger" asp-action="DeleteZaposleni" asp-route-zaposlenId="@zaposlen.Id" onclick="return confirm('Da li ste sigurni da želite da obrišete ovog zaposlenog?');">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="text-center">Nema zaposlenih.</p>
+    }
+
+    <div class="text-center mt-4">
+        <a class="btn btn-primary btn-lg" asp-controller="Zaposleni" asp-action="AddZaposleni">
+            <i class="bi bi-plus-lg"></i> Add New Zaposleni
+        </a>
+    </div>
+</div>
+
+<!-- Include Bootstrap Icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css" rel="stylesheet">

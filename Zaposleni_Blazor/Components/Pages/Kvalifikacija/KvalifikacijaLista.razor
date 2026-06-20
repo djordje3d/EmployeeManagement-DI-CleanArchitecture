@@ -1,0 +1,114 @@
+﻿@page "/kvalifikacije"
+@rendermode InteractiveServer
+
+@inject IListKvalifikacijaUseCase ListKvalifikacijaUseCase
+@inject IDeleteKvalifikacijaUseCase DeleteKvalifikacijaUseCase
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+<h3 class="mt-4">Lista Kvalifikacija</h3>
+
+<button class="btn btn-success mb-3" @onclick="OtvoriDodavanjeKvalifikacije">➕ Dodaj novu kvalifikaciju</button>
+
+@if (kvalifikacije is null)
+{
+    <p>🔄 Učitavanje podataka...</p>
+}
+else if (!kvalifikacije.Any())
+{
+    <p class="alert alert-warning">⚠️ Nema dostupnih kvalifikacija u bazi.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Lični stepen kvalifikacije</th>
+                <th>Naziv</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var kvalifikacija in kvalifikacije)
+            {
+                <tr>
+                    <td>@kvalifikacija.Id</td>
+                    <td>@kvalifikacija.LicniStepenKv</td>
+                    <td>@kvalifikacija.Naziv</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" @onclick="() => IzmeniKvalifikaciju(kvalifikacija.Id)">Izmeni</button>
+                        <button class="btn btn-danger btn-sm ms-2" @onclick="() => ObrisiKvalifikaciju(kvalifikacija.Id)">Obriši</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Kvalifikacija> kvalifikacije = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        kvalifikacije = (await ListKvalifikacijaUseCase.ExecuteAsync()).ToList();
+    }
+
+    private void OtvoriDodavanjeKvalifikacije()
+    {
+        Console.WriteLine("Kliknuto dugme za dodavanje kvalifikacije.");
+        NavigationManager.NavigateTo("/kvalifikacija/add");
+    }
+
+    private void IzmeniKvalifikaciju(int kvalifikacijaId)
+    {
+        Console.WriteLine($"Izmeni kvalifikaciju: {kvalifikacijaId}");
+        NavigationManager.NavigateTo($"/kvalifikacija/edit/{kvalifikacijaId}");
+    }
+
+    private async Task ObrisiKvalifikaciju(int kvalifikacijaId)
+    {
+        var kvalifikacijaZaBrisanje = kvalifikacije.FirstOrDefault(m => m.Id == kvalifikacijaId);
+
+        if (kvalifikacijaZaBrisanje is null)
+        {
+            Console.WriteLine($"Kvalifikacija sa ID-om {kvalifikacijaId} nije pronađeno.");
+            return;
+        }
+
+
+        bool potvrda = await ShowDeleteConfirmation($"❗ Da li ste sigurni da želite da obrišete kvalifikaciju: {kvalifikacijaZaBrisanje.Naziv}?");
+
+        if (!potvrda)
+        {
+            Console.WriteLine(" Brisanje otkazano.");
+            return;
+        }
+
+        Console.WriteLine($"Obriši kvalifikaciju: {kvalifikacijaId}");
+
+        try
+        {
+            var uspeh = await DeleteKvalifikacijaUseCase.ExecuteAsync(kvalifikacijaId);
+
+            if (uspeh)
+            {
+                kvalifikacije = (await ListKvalifikacijaUseCase.ExecuteAsync()).ToList();
+                StateHasChanged(); // Osvežava UI samo ako je brisanje uspešno
+                Console.WriteLine("Kvalifikacija uspešno obrisano!");
+            }
+            else
+            {
+                Console.WriteLine("Brisanje kvalifikacije nije uspelo!");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Greška pri brisanju kvalifikacije: {ex.Message}");
+        }
+    }
+
+    private async Task<bool> ShowDeleteConfirmation(string message)
+    {
+        return await JSRuntime.InvokeAsync<bool>("confirm", message);
+    }
+}

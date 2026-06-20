@@ -1,0 +1,79 @@
+﻿@page "/mesta/add"
+@rendermode InteractiveServer
+
+@inject IAddMestoUseCase AddMestoUseCase
+@inject NavigationManager NavigationManager
+
+<h3 class="mt-4">Dodaj novo mesto</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+<EditForm Model="mesto" OnValidSubmit="Save">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="container-fluid text-start">
+        <div class="row g-3">
+            <div class="col-12 col-md-2">
+                <label for="naziv" class="form-label">Naziv mesta</label>
+                <InputText id="naziv" class="form-control" @bind-Value="mesto.Naziv" placeholder="Unesite naziv mesta" />
+                <ValidationMessage For="@(() => mesto.Naziv)" />
+            </div>
+            <div class="col-12 col-md-2">
+                <label for="opstina" class="form-label">Naziv opštine</label>
+                <InputText id="opstina" class="form-control" @bind-Value="mesto.Opstina" placeholder="Unesite naziv opštine" />
+                <ValidationMessage For="@(() => mesto.Opstina)" />
+            </div>
+            <div class="col-12 col-md-2">
+                <label for="postanskiBroj" class="form-label">Poštanski broj</label>
+                <InputText id="postanskiBroj" class="form-control" @bind-Value="mesto.PostanskiBroj" placeholder="Unesite poštanski broj" />
+                <ValidationMessage For="@(() => mesto.PostanskiBroj)" />
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <button type="submit" class="btn btn-success me-2">Sačuvaj</button>
+                <button type="button" class="btn btn-secondary" @onclick="VratiSeNaListu">Nazad</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+
+    private Mesto mesto { get; set; } = new Mesto();
+    private string? errorMessage;
+
+    private async Task Save()
+    {
+        try
+        {
+            var uspeh = await AddMestoUseCase.ExecuteAsync(mesto);
+
+            if (uspeh)
+            {
+                Console.WriteLine($"Uspešno sačuvano mesto: {mesto.Naziv}");
+                NavigationManager.NavigateTo("/mesta"); // Povratak na listu mesta
+            }
+            else
+            {
+                errorMessage = "❌ Greška pri čuvanju mesta. Pokušajte ponovo.";
+                Console.WriteLine("❌ Došlo je do greške pri dodavanju mesta.");
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Došlo je do neočekivane greške: {ex.Message}";
+            Console.WriteLine($"Izuzetak: {ex}");
+        }
+    }
+    private void VratiSeNaListu()
+    {
+        NavigationManager.NavigateTo("/mesta");
+    }
+}

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.16" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.16">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MudBlazor" Version="8.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Zaposleni.Plugins.EFCoreSqlServer\Zaposleni.Plugins.EFCoreSqlServer.csproj" />
+    <ProjectReference Include="..\Zaposleni_Blazor.CoreBusiness\Zaposleni_Blazor.CoreBusiness.csproj" />
+    <ProjectReference Include="..\Zaposleni_Blazor.UseCases\Zaposleni_Blazor.UseCases.csproj" />
+  </ItemGroup>
+
+</Project>

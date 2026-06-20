@@ -1,0 +1,100 @@
+﻿@page "/grupamestatroskova/edit/{id:int}"
+
+@rendermode InteractiveServer
+
+@inject IGrupaMestaTroskaByIdUseCase GrupaMestaTroskovaByIdUseCase
+@inject IEditGrupaMestaTroskaUseCase EditGrupaMestaTroskovaUseCase
+@inject NavigationManager NavigationManager
+
+<h3 class="mt-4">Izmeni grupu mesta troškova</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else if (grupaMestaTroskova == null)
+{
+    <p>⏳ Učitavanje podataka...</p>
+}
+else
+{
+    <EditForm Model="grupaMestaTroskova" OnValidSubmit="Save">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="container-fluid text-start">
+        <div class="row g-3">
+            <div class="col-12 col-md-2">
+                <label for="grupa" class="form-label">Šifra grupa mesta troškova</label>
+                <InputText id="grupa" class="form-control" @bind-Value="grupaMestaTroskova.Grupa" placeholder="Unesite grupu mesta troškova" />
+                <ValidationMessage For="@(() => grupaMestaTroskova.Grupa)" />
+            </div>
+
+            <div class="col-12 col-md-4">
+                <label for="naziv" class="form-label">Naziv grupe mesta troškova</label>
+                <InputText id="naziv" class="form-control" @bind-Value="grupaMestaTroskova.Naziv" placeholder="Unesite naziv grupe mesta troškova" />
+                <ValidationMessage For="@(() => grupaMestaTroskova.Naziv)" />
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <button type="submit" class="btn btn-success me-2">Sačuvaj</button>
+                <button type="button" class="btn btn-secondary" @onclick="VratiSeNaListu">Nazad</button>
+            </div>
+        </div>
+    </div>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+
+    private GrupaMestaTroskova grupaMestaTroskova { get; set; } = new GrupaMestaTroskova();
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            grupaMestaTroskova = await GrupaMestaTroskovaByIdUseCase.ExecuteAsync(id);
+
+            if (grupaMestaTroskova == null)
+            {
+                errorMessage = "Grupa mesta troškova nije pronađena.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Došlo je do greške pri učitavanju podataka: {ex.Message}";
+        }
+    }
+
+    private async Task Save()
+    {
+        try
+        {
+            var success = await EditGrupaMestaTroskovaUseCase.ExecuteAsync(grupaMestaTroskova!);
+
+            if (success)
+            {
+                Console.WriteLine($"Uspešno sačuvano grupa mesta troškova: {grupaMestaTroskova.Naziv}");
+                NavigationManager.NavigateTo("/grupemestatroskova");
+            }
+            else
+            {
+                errorMessage = "Greška pri snimanju izmena grupe mesta troškova.";
+                Console.WriteLine("Došlo je do greške pri izmeni grupe mesta troškova.");
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Greška: {ex.Message}";
+        }
+    }
+
+    private void VratiSeNaListu()
+    {
+        NavigationManager.NavigateTo("/grupemestatroskova");
+    }
+}

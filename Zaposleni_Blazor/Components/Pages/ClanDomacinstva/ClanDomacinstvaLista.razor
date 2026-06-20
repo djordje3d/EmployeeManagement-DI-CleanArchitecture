@@ -1,0 +1,120 @@
+﻿@page "/clanovidomacinstva"
+@rendermode InteractiveServer
+
+@inject ICrudClanoviDomacinstvaUseCases ClanoviDomacinstvaUseCases
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+<h3 class="mt-4">Lista članova domaćinstva</h3>
+
+<button class="btn btn-success mb-3" @onclick="OtvoriDodavanjeClanaDomacinstva">➕ Dodaj novog člana</button>
+
+@if (clanoviDomacinstva is null)
+{
+    <p>🔄 Učitavanje podataka...</p>
+}
+else if (!clanoviDomacinstva.Any())
+{
+    <p class="alert alert-warning">⚠️ Nema dostupnih članova domaćinstva u bazi.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Ime člana</th>
+                <th>JMBG</th>
+                <th>Srodstvo člana</th>
+                <th>Datum rođenja</th>
+                <th>Zaposlen</th>
+                <th>Opcije</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var clanDom in clanoviDomacinstva)
+            {
+                <tr>
+                    <td>@clanDom.Id</td>
+                    <td>@clanDom.ImeClana</td>
+                    <td>@clanDom.JMBG</td>
+                    <td>@clanDom.SroClana</td>
+                    <td>@clanDom.DatumRodjenjaClana?.ToString("dd.MM.yyyy.")</td>
+                    <td>@clanDom.Zaposlen?.Ime</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" @onclick="() => IzmeniClanaDomacinstva(clanDom.Id)">Izmeni</button>
+                        <button class="btn btn-danger btn-sm ms-2" @onclick="() => ObrisiClanaDomacinstva(clanDom.Id)">Obriši</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<ClanoviDomacinstva> clanoviDomacinstva = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        clanoviDomacinstva = (await ClanoviDomacinstvaUseCases.GetAllAsync()).ToList();
+    }
+
+    private void OtvoriDodavanjeClanaDomacinstva()
+    {
+        Console.WriteLine("Kliknuto dugme za dodavanje člana domaćinstva.");
+        NavigationManager.NavigateTo("/clandomacinstva/add");
+    }
+
+    private void IzmeniClanaDomacinstva(int clanDomId)
+    {
+        Console.WriteLine($"Izmeni člana domaćinstva: {clanDomId}");
+        NavigationManager.NavigateTo($"/clandomacinstva/edit/{clanDomId}");
+    }
+
+    private async Task ObrisiClanaDomacinstva(int clanDomId)
+    {
+        var clanoviDomacinstvaZaBrisanje = clanoviDomacinstva.FirstOrDefault(m => m.Id == clanDomId);
+
+        if (clanoviDomacinstvaZaBrisanje is null)
+        {
+            Console.WriteLine($"Član dom. sa ID-om {clanDomId} nije pronađeno.");
+            return;
+        }
+
+
+        bool potvrda = await ShowDeleteConfirmation($"❗ Da li ste sigurni da želite da obrišete člana domaćinstva: {clanoviDomacinstvaZaBrisanje.ImeClana}?");
+
+        if (!potvrda)
+        {
+            Console.WriteLine(" Brisanje otkazano.");
+            return;
+        }
+
+        Console.WriteLine($"Obriši člana domaćinstva: {clanDomId}");
+
+        try
+        {
+            var uspeh = await ClanoviDomacinstvaUseCases.DeleteAsync(clanDomId);
+
+            if (uspeh)
+            {
+                clanoviDomacinstva = (await ClanoviDomacinstvaUseCases.GetAllAsync()).ToList();
+                StateHasChanged(); // Osvežava UI samo ako je brisanje uspešno
+                Console.WriteLine("član domaćinstva uspešno obrisan!");
+            }
+            else
+            {
+                Console.WriteLine("Brisanje člana domaćinstva nije uspelo!");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Greška pri brisanju člana domaćinstva: {ex.Message}");
+        }
+    }
+
+    private async Task<bool> ShowDeleteConfirmation(string message)
+    {
+        return await JSRuntime.InvokeAsync<bool>("confirm", message);
+    }
+}

@@ -1,0 +1,75 @@
+﻿@page "/grupamestatroskova/add"
+@rendermode InteractiveServer
+
+@inject IAddGrupaMestaTroskaUseCase AddGrupaMestaTroskovaUseCase
+@inject NavigationManager NavigationManager
+
+<h3 class="mt-4">Dodaj novu grupu mesta troškova</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+<EditForm Model="grupaMestaTroskova" OnValidSubmit="Save">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="container-fluid text-start">
+        <div class="row g-3">
+            <div class="col-12 col-md-2">
+                <label for="grupa" class="form-label">Šifra grupe mesta troškova</label>
+                <InputText id="grupa" class="form-control" @bind-Value="grupaMestaTroskova.Grupa" placeholder="Unesite grupu mesta troškova" />
+                <ValidationMessage For="@(() => grupaMestaTroskova.Grupa)" />
+            </div>
+
+            <div class="col-12 col-md-4">
+                <label for="naziv" class="form-label">Naziv grupe mesta troškova</label>
+                <InputText id="naziv" class="form-control" @bind-Value="grupaMestaTroskova.Naziv" placeholder="Unesite naziv grupe mesta troškova" />
+                <ValidationMessage For="@(() => grupaMestaTroskova.Naziv)" />
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <button type="submit" class="btn btn-success me-2">Sačuvaj</button>
+                <button type="button" class="btn btn-secondary" @onclick="VratiSeNaListu">Nazad</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+
+    private GrupaMestaTroskova grupaMestaTroskova { get; set; } = new GrupaMestaTroskova();
+    private string? errorMessage;
+
+    private async Task Save()
+    {
+        try
+        {
+            var uspeh = await AddGrupaMestaTroskovaUseCase.ExecuteAsync(grupaMestaTroskova);
+
+            if (uspeh)
+            {
+                Console.WriteLine($"Uspešno sačuvana grupa mesta troškova: {grupaMestaTroskova.Naziv}");
+                NavigationManager.NavigateTo("/grupemestatroskova"); // Povratak na listu grupe MT
+            }
+            else
+            {
+                errorMessage = "Greška pri čuvanju grupe mesta troškova. Pokušajte ponovo.";
+                Console.WriteLine("Došlo je do greške pri dodavanju grupe mesta troškova.");
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Došlo je do neočekivane greške: {ex.Message}";
+            Console.WriteLine($"Izuzetak: {ex}");
+        }
+    }
+    private void VratiSeNaListu()
+    {
+        NavigationManager.NavigateTo("/grupemestatroskova");
+    }
+}

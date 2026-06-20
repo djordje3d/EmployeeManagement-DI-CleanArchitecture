@@ -1,0 +1,26 @@
+# Visual Studio
+.vs/
+
+# Build results
+bin/
+obj/
+
+# Ignore all bin and obj folders in subprojects
+**/bin/
+**/obj/
+
+# User-specific files
+*.user
+*.suo
+
+# Visual Studio Code
+.vscode/
+
+# Rider
+.idea/
+
+# Development settings
+appsettings.Development.json
+
+# NuGet
+packages/

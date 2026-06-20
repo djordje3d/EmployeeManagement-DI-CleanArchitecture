@@ -1,0 +1,230 @@
+﻿@model Zaposlen
+
+@{
+    ViewData["Title"] = "Add Zaposlen";
+}
+
+<div class="container mt-4" style="max-width: 80%;">
+    <h3 class="mb-4 text-center">Add New Zaposlen</h3>
+
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <form method="post" asp-action="AddZaposleni">
+                <div class="text-danger mb-3" asp-validation-summary="All"></div>
+
+                <div class="row">
+                    <!-- Prva kolona -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="Ime" class="form-label">Ime</label>
+                            <input type="text" asp-for="Ime" class="form-control" placeholder="Unesite ime" />
+                            <span class="text-danger" asp-validation-for="Ime"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Prezime" class="form-label">Prezime</label>
+                            <input type="text" asp-for="Prezime" class="form-control" placeholder="Unesite prezime" />
+                            <span class="text-danger" asp-validation-for="Prezime"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Roditelj" class="form-label">Ime oca</label>
+                            <input type="text" asp-for="Roditelj" class="form-control" placeholder="Unesite ime roditelja" />
+                            <span class="text-danger" asp-validation-for="Roditelj"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DatumRodjenja" class="form-label">Datum Rođenja</label>
+                            <div class="input-group calendar-container">
+                                <input type="text" asp-for="DatumRodjenja" class="form-control" id="datepicker" placeholder="Odaberite datum" autocomplete="off" />
+                                <span class="input-group-text bg-white">
+                                    <i class="fa fa-calendar calendar-icon" id="calendar-icon"></i>
+                                </span>
+                            </div>
+                            <span class="text-danger" asp-validation-for="DatumRodjenja"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="JMBG" class="form-label">JMBG</label>
+                            <input type="text" asp-for="JMBG" class="form-control" placeholder="Unesite JMBG" />
+                            <span class="text-danger" asp-validation-for="JMBG"></span>
+                        </div>
+                    </div>
+
+                    <!-- Druga kolona -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="Telefon" class="form-label">Telefon</label>
+                            <input type="text" asp-for="Telefon" class="form-control" placeholder="Unesite broj telefona" />
+                            <span class="text-danger" asp-validation-for="Telefon"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Adresa" class="form-label">Adresa</label>
+                            <input type="text" asp-for="Adresa" class="form-control" placeholder="Unesite adresu" />
+                            <span class="text-danger" asp-validation-for="Adresa"></span>
+                        </div>
+
+                        <div class="mb-3 dropdown">
+                            <label asp-for="MestoId" class="form-label">Mesto</label>
+                            <div class="dropdown-container">
+                                @Html.DropDownListFor(
+                                         model => model.MestoId,
+                                         ViewBag.Mesta as SelectList,
+                                         "Izaberite mesto",
+                                         new { @class = "form-control" })
+                                <i class="fa fa-caret-down dropdown-icon"></i>
+                            </div>
+                            <span class="text-danger" asp-validation-for="MestoId"></span>
+                        </div>
+
+                        <div class="mb-3 dropdown">
+                            <label asp-for="Vrsta_RadnogOdnosa" class="form-label">Vrsta Radnog Odnosa</label>
+                            <div class="dropdown-container">
+                                <select asp-for="Vrsta_RadnogOdnosa" class="form-control">
+                                    <option value="">--Izaberite vrstu radnog odnosa--</option>
+                                    <option value="Privremeni">Privremeni</option>
+                                    <option value="Stalni">Stalni</option>
+                                    <option value="Honoraran">Honoraran</option>
+                                </select>
+                                <i class="fa fa-caret-down dropdown-icon"></i>
+                            </div>
+                            <span class="text-danger" asp-validation-for="Vrsta_RadnogOdnosa"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dugmad za potvrdu -->
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-secondary" onclick="indexZaposleni()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Stilovi -->
+<style>
+    .dropdown-container {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .dropdown-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 18px;
+        color: #555;
+        pointer-events: none;
+    }
+
+    select {
+        padding-right: 35px;
+    }
+
+    .calendar-container {
+        position: relative;
+    }
+
+    .calendar-icon {
+        cursor: pointer;
+        font-size: 18px;
+        color: #007bff;
+    }
+
+    .ui-datepicker {
+        font-size: 16px;
+        background-color: #f8f9fa;
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        z-index: 9999 !important;
+    }
+
+    .ui-datepicker-header {
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
+        padding: 8px;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .ui-datepicker-prev, .ui-datepicker-next {
+        background-color: transparent;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+        .ui-datepicker-prev:hover, .ui-datepicker-next:hover {
+            color: #ffc107;
+        }
+
+    .ui-state-highlight {
+        background-color: #28a745 !important;
+        color: white !important;
+        border-radius: 50%;
+        font-weight: bold;
+    }
+
+    .ui-state-hover {
+        background-color: #ffc107 !important;
+        border-radius: 50%;
+        color: black !important;
+    }
+</style>
+
+<!-- Skripte -->
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+    <script>
+        function indexZaposleni() {
+            window.location.href = '@Url.Action("Index", "Zaposleni")'
+        }
+
+        $(document).ready(function () {
+            $.datepicker.regional['sr'] = {
+                closeText: 'Zatvori',
+                prevText: 'Prethodni',
+                nextText: 'Sledeći',
+                currentText: 'Danas',
+                monthNames: ['Januar', 'Februar', 'Mart', 'April', 'Maj', 'Jun',
+                    'Jul', 'Avgust', 'Septembar', 'Oktobar', 'Novembar', 'Decembar'],
+                monthNamesShort: ['Jan', 'Feb', 'Mar', 'Apr', 'Maj', 'Jun',
+                    'Jul', 'Avg', 'Sep', 'Okt', 'Nov', 'Dec'],
+                dayNames: ['Nedelja', 'Ponedeljak', 'Utorak', 'Sreda', 'Četvrtak', 'Petak', 'Subota'],
+                dayNamesShort: ['Ned', 'Pon', 'Uto', 'Sre', 'Čet', 'Pet', 'Sub'],
+                dayNamesMin: ['Ne', 'Po', 'Ut', 'Sr', 'Če', 'Pe', 'Su'],
+                weekHeader: 'Nedelja',
+                dateFormat: 'dd.mm.yy',
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: ''
+            };
+            $.datepicker.setDefaults($.datepicker.regional['sr']);
+
+            $("#datepicker").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                showAnim: "slideDown"
+            });
+
+            // Otvori kalendar klikom na ikonicu
+            $("#calendar-icon").on("click", function () {
+                $("#datepicker").datepicker("show");
+            });
+        });
+    </script>
+}

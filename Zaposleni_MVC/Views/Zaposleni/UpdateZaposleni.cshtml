@@ -1,0 +1,139 @@
+﻿@model Zaposlen
+
+@{
+    ViewData["Title"] = "Update Zaposlen";
+}
+
+<div class="container mt-4" style="max-width: 80%;">
+    <h3 class="mb-4 text-center">Update Zaposlen</h3>
+
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <form method="post" asp-action="UpdateZaposleni">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="text-danger mb-3" asp-validation-summary="All"></div>
+
+                <div class="row">
+                    <!-- Prva kolona -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="Ime" class="form-label">Ime</label>
+                            <input type="text" asp-for="Ime" class="form-control" placeholder="Unesite ime" />
+                            <span class="text-danger" asp-validation-for="Ime"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Prezime" class="form-label">Prezime</label>
+                            <input type="text" asp-for="Prezime" class="form-control" placeholder="Unesite prezime" />
+                            <span class="text-danger" asp-validation-for="Prezime"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Roditelj" class="form-label">Ime oca</label>
+                            <input type="text" asp-for="Roditelj" class="form-control" placeholder="Unesite ime roditelja" />
+                            <span class="text-danger" asp-validation-for="Roditelj"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DatumRodjenja" class="form-label">Datum Rođenja</label>
+                            <input type="date" asp-for="DatumRodjenja" class="form-control" />
+                            <span class="text-danger" asp-validation-for="DatumRodjenja"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="JMBG" class="form-label">JMBG</label>
+                            <input type="text" asp-for="JMBG" class="form-control" placeholder="Unesite JMBG" />
+                            <span class="text-danger" asp-validation-for="JMBG"></span>
+                        </div>
+                    </div>
+
+                    <!-- Druga kolona -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="Telefon" class="form-label">Telefon</label>
+                            <input type="text" asp-for="Telefon" class="form-control" placeholder="Unesite broj telefona" />
+                            <span class="text-danger" asp-validation-for="Telefon"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Adresa" class="form-label">Adresa</label>
+                            <input type="text" asp-for="Adresa" class="form-control" placeholder="Unesite adresu" />
+                            <span class="text-danger" asp-validation-for="Adresa"></span>
+                        </div>
+
+                        <!-- Dropdown sa Font Awesome ikonom -->
+                        <div class="mb-3 dropdown">
+                            <label asp-for="MestoId" class="form-label">Mesto</label>
+                            <div class="dropdown-container">
+                                @Html.DropDownListFor(
+                                             model => model.MestoId,
+                                             ViewBag.Mesta as SelectList,
+                                             "Izaberite mesto",
+                                             new { @class = "form-control" })
+                                <i class="fa fa-caret-down dropdown-icon"></i>
+                            </div>
+                            <span class="text-danger" asp-validation-for="MestoId"></span>
+                        </div>
+
+                        <div class="mb-3 dropdown">
+                            <label asp-for="Vrsta_RadnogOdnosa" class="form-label">Vrsta Radnog Odnosa</label>
+                            <div class="dropdown-container">
+                                <select asp-for="Vrsta_RadnogOdnosa" class="form-control">
+                                    <option value="">--Izaberite vrstu radnog odnosa--</option>
+                                    <option value="Privremeni">Privremeni</option>
+                                    <option value="Stalni">Stalni</option>
+                                    <option value="Honoraran">Honoraran</option>
+                                </select>
+                                <i class="fa fa-caret-down dropdown-icon"></i>
+                            </div>
+                            <span class="text-danger" asp-validation-for="Vrsta_RadnogOdnosa"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dugmad za potvrdu -->
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <button type="button" class="btn btn-secondary" onclick="indexZaposleni()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Stilizacija za dropdown sa Font Awesome ikonama -->
+<style>
+    .dropdown-container {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .dropdown-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 18px;
+        color: #555;
+        pointer-events: none;
+    }
+
+    select {
+        padding-right: 35px; /* Omogućava prostor za ikonu */
+    }
+</style>
+
+<!-- Add Bootstrap validation scripts -->
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+        <script>
+            function indexZaposleni() {
+                window.location.href = '@Url.Action("Index", "Zaposleni")'
+            }
+        </script>
+}

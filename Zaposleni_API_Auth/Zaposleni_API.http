@@ -1,0 +1,6 @@
+@Zaposleni_API_Auth_HostAddress = http://localhost:5214
+
+GET {{Zaposleni_API_Auth_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

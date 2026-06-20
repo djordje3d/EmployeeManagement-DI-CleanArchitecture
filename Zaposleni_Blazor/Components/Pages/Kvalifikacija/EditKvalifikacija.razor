@@ -1,0 +1,100 @@
+﻿@page "/kvalifikacija/edit/{id:int}"
+
+@rendermode InteractiveServer
+
+@inject IKvalifikacijaByIdUseCase KvalifikacijaByIdUseCase
+@inject IEditKvalifikacijaUseCase EditKvalifikacijaUseCase
+@inject NavigationManager NavigationManager
+
+<h3 class="mt-4">Izmeni kvalifikaciju</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else if (kvalifikacija == null)
+{
+    <p>⏳ Učitavanje podataka...</p>
+}
+else
+{
+    <EditForm Model="kvalifikacija" OnValidSubmit="Save">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="container-fluid text-start">
+            <div class="row g-3">
+                <div class="col-12 col-md-2">
+                    <label for="licniStepenKv" class="form-label">Lični stepen kvalifikacije</label>
+                    <InputText id="licniStepenKv" class="form-control" @bind-Value="kvalifikacija.LicniStepenKv" placeholder="Unesite stepen kvalifikacije" />
+                    <ValidationMessage For="@(() => kvalifikacija.LicniStepenKv)" />
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label for="naziv" class="form-label">Naziv kvalifikacije</label>
+                    <InputText id="naziv" class="form-control" @bind-Value="kvalifikacija.Naziv" placeholder="Unesite naziv kvalifikacije" />
+                    <ValidationMessage For="@(() => kvalifikacija.Naziv)" />
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-success me-2">Sačuvaj</button>
+                    <button type="button" class="btn btn-secondary" @onclick="VratiSeNaListu">Nazad</button>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+
+    private Kvalifikacija? kvalifikacija;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            kvalifikacija = await KvalifikacijaByIdUseCase.ExecuteAsync(id);
+
+            if (kvalifikacija == null)
+            {
+                errorMessage = "Kvalifikacija nije pronađena.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Došlo je do greške pri učitavanju podataka: {ex.Message}";
+        }
+    }
+
+    private async Task Save()
+    {
+        try
+        {
+            var success = await EditKvalifikacijaUseCase.ExecuteAsync(kvalifikacija!);
+
+            if (success)
+            {
+                Console.WriteLine($"Uspešno sačuvano kvalifikacija: {kvalifikacija.Naziv}");
+                NavigationManager.NavigateTo("/kvalifikacije");
+            }
+            else
+            {
+                errorMessage = "Greška pri snimanju izmena.";
+                Console.WriteLine("Došlo je do greške pri izmeni kvalifikacije.");
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Greška: {ex.Message}";
+        }
+    }
+
+    private void VratiSeNaListu()
+    {
+        NavigationManager.NavigateTo("/kvalifikacije");
+    }
+}

@@ -1,0 +1,139 @@
+﻿@page "/sistematizacija/add"
+@rendermode InteractiveServer
+
+@inject ICrudSistematizacijaUseCases CrudSistematizacijaUseCases
+@inject NavigationManager NavigationManager
+
+<h3 class="mt-4">Dodaj novu sistematizaciju</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+<EditForm Model="sistematizacija" OnValidSubmit="Save">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="container-fluid text-start">
+        <div class="row g-3">
+            <!-- Red 1: samo NazivRadnogMesta -->
+            <div class="col-12 col-md-2">
+                <label class="form-label">Naziv radnog mesta</label>
+                <InputText class="form-control" @bind-Value="sistematizacija.NazivRadnogMesta" placeholder="Unesite naziv radnog mesta" />
+                <ValidationMessage For="@(() => sistematizacija.NazivRadnogMesta)" />
+            </div>
+
+            <!-- Red 2: ostala četiri polja smanjena na četvrtinu -->
+            <div class="col-6 col-md-1">
+                <label class="form-label">Koeficijent</label>
+                <InputNumber class="form-control" @bind-Value="sistematizacija.Koeficijent" placeholder="Koeficijent" step="0.001" max="999.999" />
+                <ValidationMessage For="@(() => sistematizacija.Koeficijent)" />
+            </div>
+            <div class="col-6 col-md-1">
+                <label class="form-label">Radno iskustvo</label>
+                <InputText class="form-control" @bind-Value="sistematizacija.Radno_Iskustvo" placeholder="Iskustvo" />
+                <ValidationMessage For="@(() => sistematizacija.Radno_Iskustvo)" />
+            </div>
+            <div class="col-6 col-md-1">
+                <label class="form-label">Beneficirani staž</label>
+                <InputNumber class="form-control" @bind-Value="sistematizacija.Beneficirani_Radni_Staz" placeholder="Staž" />
+                <ValidationMessage For="@(() => sistematizacija.Beneficirani_Radni_Staz)" />
+            </div>
+            <div class="col-6 col-md-1">
+                <label class="form-label">Bodovi</label>
+                <InputNumber class="form-control" @bind-Value="sistematizacija.Bodovi" placeholder="Bodovi" />
+                <ValidationMessage For="@(() => sistematizacija.Bodovi)" />
+            </div>
+
+            <!-- Red 3: Opis, OrganizacioneJediniceId, KvalifikacijaId -->
+            <div class="col-12 col-md-4">
+                <label class="form-label">Opis</label>
+                <InputTextArea class="form-control" @bind-Value="sistematizacija.Opis" placeholder="Unesite Opis (do 4000 karaktera)" rows="4" />
+                <ValidationMessage For="@(() => sistematizacija.Opis)" />
+            </div>
+            <div class="col-12 col-md-3">
+                <label class="form-label">Organizaciona jedinica</label>
+                <InputSelect class="form-control" @bind-Value="sistematizacija.OrganizacioneJediniceId">
+                    <option value="">-- Izaberite organizacionu jedinicu --</option>
+                    @foreach (var orgJedinica in listaOrganizacioneJedinice)
+                    {
+                        <option value="@orgJedinica.Id">@orgJedinica.Naziv</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => sistematizacija.OrganizacioneJediniceId)" />
+            </div>
+            <div class="col-12 col-md-3">
+                <label class="form-label">Kvalifikacija</label>
+                <InputSelect class="form-control" @bind-Value="sistematizacija.KvalifikacijaId">
+                    <option value="">-- Izaberite kvalifikaciju --</option>
+                    @foreach (var kvalifikacija in listaKvalifikacije)
+                    {
+                        <option value="@kvalifikacija.Id">@kvalifikacija.Naziv</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => sistematizacija.KvalifikacijaId)" />
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <button type="submit" class="btn btn-success me-2">Sačuvaj</button>
+                <button type="button" class="btn btn-secondary" @onclick="VratiSeNaListu">Nazad</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+
+@code {
+
+    private Sistematizacija sistematizacija { get; set; } = new();
+    private List<OrganizacioneJedinice> listaOrganizacioneJedinice = new();
+    private List<Kvalifikacija> listaKvalifikacije = new();
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            listaOrganizacioneJedinice = (await CrudSistematizacijaUseCases.GetAllOrganizacioneJediniceAsync()).ToList();
+            listaKvalifikacije = (await CrudSistematizacijaUseCases.GetAllKvalifikacijeAsync()).ToList();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"❌ Greška pri učitavanju oj ili kvalifikacija: {ex.Message}";
+            Console.WriteLine($"❌ Izuzetak: {ex}");
+        }
+    }
+
+    private async Task Save()
+    {
+        try
+        {
+            var uspeh = await CrudSistematizacijaUseCases.AddAsync(sistematizacija);
+
+            if (uspeh)
+            {
+                Console.WriteLine($"Uspešno sačuvana sistematizacija: {sistematizacija.NazivRadnogMesta}");
+                NavigationManager.NavigateTo("/sistematizacije"); // Povratak na listu jedinica
+            }
+            else
+            {
+                errorMessage = "❌ Greška pri čuvanju sistematizacije. Pokušajte ponovo.";
+                Console.WriteLine("❌ Došlo je do greške pri dodavanju sistematizacije.");
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"❌ Neočekivana greška: {ex.Message}";
+            Console.WriteLine($"❌ Izuzetak: {ex}");
+        }
+    }
+
+    private void VratiSeNaListu()
+    {
+        NavigationManager.NavigateTo("/sistematizacije");
+    }
+}

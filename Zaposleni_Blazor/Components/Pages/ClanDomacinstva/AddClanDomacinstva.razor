@@ -1,0 +1,141 @@
+﻿@page "/clandomacinstva/add"
+@rendermode InteractiveServer
+
+@inject ICrudClanoviDomacinstvaUseCases ClanoviDomacinstvaUseCases
+@inject NavigationManager NavigationManager
+
+<h3 class="mt-4">Dodaj novog člana domaćinstva</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+        <div class="alert alert-danger">@errorMessage</div>
+}
+
+<EditForm Model="clanDomacinstva" OnValidSubmit="Save">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="container-fluid  text-start">
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <label class="form-label">Ime člana</label>
+                <InputText class="form-control" @bind-Value="clanDomacinstva.ImeClana" placeholder="Unesite ime člana domaćinstva" />
+                <ValidationMessage For="@(() => clanDomacinstva.ImeClana)" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">JMBG</label>
+                <InputText class="form-control" @bind-Value="clanDomacinstva.JMBG" placeholder="Unesite JMBG" />
+                <ValidationMessage For="@(() => clanDomacinstva.JMBG)" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Datum rođenja</label>
+                <InputDate class="form-control" @bind-Value="clanDomacinstva.DatumRodjenjaClana" />
+                <ValidationMessage For="@(() => clanDomacinstva.DatumRodjenjaClana)" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Roditelj</label>
+                <InputText class="form-control" @bind-Value="clanDomacinstva.Roditelj" placeholder="Unesite ime roditelja" />
+                <ValidationMessage For="@(() => clanDomacinstva.Roditelj)" />
+            </div>
+            <div class="col-md-1">
+                <label class="form-label">Pol člana</label>
+                <InputRadioGroup @bind-Value="clanDomacinstva.PolClana">
+                    <div class="form-check">
+                        <InputRadio class="form-check-input" Value="@( "M" )" id="polMuski" />
+                        <label class="form-check-label" for="polMuski">Muški</label>
+                    </div>
+                    <div class="form-check">
+                        <InputRadio class="form-check-input" Value="@( "Ž" )" id="polZenski" />
+                        <label class="form-check-label" for="polZenski">Ženski</label>
+                    </div>
+                </InputRadioGroup>
+                <ValidationMessage For="@(() => clanDomacinstva.PolClana)" />
+            </div>
+
+
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-2">
+                <label class="form-label">Srodstvo</label>
+                <InputText class="form-control" @bind-Value="clanDomacinstva.SroClana" placeholder="Unesite srodstvo" />
+                <ValidationMessage For="@(() => clanDomacinstva.SroClana)" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Status člana</label>
+                <InputText class="form-control" @bind-Value="clanDomacinstva.StatusClana" placeholder="Unesite status" />
+                <ValidationMessage For="@(() => clanDomacinstva.StatusClana)" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Zaposleni</label>
+                <InputSelect class="form-control" @bind-Value="clanDomacinstva.ZaposlenId">
+                    <option value="">-- Izaberi zaposlenog --</option>
+                    @foreach (var zaposlen in listaZaposlenih)
+                    {
+                        <option value="@zaposlen.Id">@($"{zaposlen.Ime} {zaposlen.Prezime}")</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => clanDomacinstva.ZaposlenId)" />
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <button type="submit" class="btn btn-success me-2">Sačuvaj</button>
+                <button type="button" class="btn btn-secondary" @onclick="VratiSeNaListu">Nazad</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+
+@code {
+    @code {
+        private ClanoviDomacinstva clanDomacinstva { get; set; } = new();
+        private List<Zaposlen> listaZaposlenih = new();
+        private string? errorMessage;
+
+        protected override async Task OnInitializedAsync()
+        {
+            try
+            {
+                listaZaposlenih = (await ClanoviDomacinstvaUseCases.GetAllZaposleniAsync()).ToList();
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"❌ Greška pri učitavanju zaposlenih: {ex.Message}";
+                Console.WriteLine($"❌ Izuzetak: {ex}");
+            }
+        }
+    }
+
+        private async Task Save()
+        {
+            try
+            {
+                var uspeh = await ClanoviDomacinstvaUseCases.AddAsync(clanDomacinstva);
+
+                if (uspeh)
+                {
+                    Console.WriteLine($"Uspešno sačuvan član domaćinstva: {clanDomacinstva.ImeClana}");
+                    NavigationManager.NavigateTo("/clanovidomacinstva"); // Povratak na listu jedinica
+                }
+                else
+                {
+                    errorMessage = "❌ Greška pri čuvanju član domaćinstva. Pokušajte ponovo.";
+                    Console.WriteLine("❌ Došlo je do greške pri dodavanju člana domaćinstva.");
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"❌ Neočekivana greška: {ex.Message}";
+                Console.WriteLine($"❌ Izuzetak: {ex}");
+            }
+        }
+
+        private void VratiSeNaListu()
+        {
+            NavigationManager.NavigateTo("/clanovidomacinstva");
+        }
+}

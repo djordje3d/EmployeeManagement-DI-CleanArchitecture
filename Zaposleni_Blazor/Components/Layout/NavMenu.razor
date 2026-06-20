@@ -1,0 +1,73 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Zaposleni_Blazor</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+
+@*         <div class="nav-item px-3">
+            <NavLink class="nav-link" href="counter">
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="weather">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+            </NavLink>
+        </div> *@
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="kvalifikacije">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Kvalifikacije
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="mesta">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Mesta
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="orgjedinice">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Org. Jedinice
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="grupemestatroskova">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Grupe mesta troškova
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="sistematizacije">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Sistematizacije
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="zaposleni">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Zaposleni
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="clanovidomacinstva">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Članovi domaćinstva
+            </NavLink>
+        </div>
+        
+    </nav>
+</div>
+

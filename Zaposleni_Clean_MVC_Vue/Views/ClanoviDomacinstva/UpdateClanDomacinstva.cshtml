@@ -1,0 +1,136 @@
+﻿@model             ClanoviDomacinstva
+
+@{
+    ViewData["Title"] = "Update član domaćinstva";
+}
+
+<div class="container mt-4" style="max-width: 50%;">
+    <h3 class="mb-4 text-center">Update član domaćinstva</h3>
+
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <form method="post" asp-action="UpdateClanDomacinstva">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="text-danger mb-3" asp-validation-summary="All"></div>
+
+                <!-- Ime radnika za koga se unose članovi domaćinstva -->
+                <div class="mb-3 row">
+                    <label asp-for="ZaposlenId" class="col-sm-3 col-form-label">Zaposleni</label>
+                    <div class="col-sm-9">
+                        @Html.DropDownListFor(
+                                 model => model.ZaposlenId,
+                                 ViewBag.Zaposleni as SelectList,
+                                 "Izaberite zaposlenog",
+                                 new { @class = "form-control" })
+                        <span class="text-danger" asp-validation-for="ZaposlenId"></span>
+                    </div>
+                </div>
+
+                <!-- Ime člana domaćinstva-->
+                <div class="mb-3 row">
+                    <label asp-for="ImeClana" class="col-sm-3 col-form-label">Ime</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="ImeClana" class="form-control" placeholder="Unesite ime člana" />
+                        <span class="text-danger" asp-validation-for="ImeClana"></span>
+                    </div>
+                </div>
+
+                <!-- Pol člana domaćinstva -->
+                <div class="mb-3 row">
+                    <label class="col-sm-3 col-form-label">Pol</label>
+                    <div class="col-sm-9">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" asp-for="PolClana" value="M" id="MOption" />
+                            <label class="form-check-label" for="MOption">Muški</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" asp-for="PolClana" value="Z" id="ZOption" />
+                            <label class="form-check-label" for="ZOption">Ženski</label>
+                        </div>
+                        <span class="text-danger" asp-validation-for="PolClana"></span>
+                    </div>
+                </div>
+
+                <!-- Datum Rodjenja člana domaćinstva-->
+                <div class="mb-3 row">
+                    <label asp-for="DatumRodjenjaClana" class="col-sm-3 col-form-label">Datum Rođenja</label>
+                    <div class="col-sm-9">
+                        <input type="date" asp-for="DatumRodjenjaClana" class="form-control" />
+                        <span class="text-danger" asp-validation-for="DatumRodjenjaClana"></span>
+                    </div>
+                </div>
+
+                <!-- Roditelj -->
+                <div class="mb-3 row">
+                    <label asp-for="Roditelj" class="col-sm-3 col-form-label">Roditelj</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="Roditelj" class="form-control" placeholder="Unesite ime roditelja" />
+                        <span class="text-danger" asp-validation-for="Roditelj"></span>
+                    </div>
+                </div>
+
+                <!-- JMBG -->
+                <div class="mb-3 row">
+                    <label asp-for="JMBG" class="col-sm-3 col-form-label">JMBG</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="JMBG" class="form-control" placeholder="Unesite JMBG" />
+                        <span class="text-danger" asp-validation-for="JMBG"></span>
+                    </div>
+                </div>
+
+                <!-- Vrsta Radnog Odnosa Dropdown -->
+                <div class="mb-3 row">
+                    <label asp-for="SroClana" class="col-sm-3 col-form-label">Srodstvo člana domaćinstva</label>
+                    <div class="col-sm-9">
+                        <select asp-for="SroClana" class="form-control">
+                            <option value="">--Izaberite vrstu srodstva--</option>
+                            <option value="Otac">Otac</option>
+                            <option value="Majka">Majka</option>
+                            <option value="Suprug">Suprug</option>
+                            <option value="Supruga">Supruga</option>
+                            <option value="Brat">Brat</option>
+                            <option value="Sestra">Sestra</option>
+                            <option value="Sin">Sin</option>
+                            <option value="Ćerka">Ćerka</option>
+                            <option value="Unuk">Unuk</option>
+                            <option value="Unuka">Unuka</option>
+                        </select>
+                        <span class="text-danger" asp-validation-for="SroClana"></span>
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div class="mb-3 row">
+                    <label asp-for="StatusClana" class="col-sm-3 col-form-label">Status člana</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="StatusClana" class="form-control" placeholder="Unesite status člana" />
+                        <span class="text-danger" asp-validation-for="StatusClana"></span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mb-3 row">
+                    <div class="col-sm-9 offset-sm-3">
+                        <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                        <button type="button" class="btn btn-secondary btn-block" onclick="indexClanoviDomacinstva()" style="margin-left: 10px;">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Add Bootstrap validation scripts -->
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        function indexClanoviDomacinstva() {
+            window.location.href = '@Url.Action("Index", "ClanoviDomacinstva")'
+        }
+    </script>
+}

@@ -1,0 +1,177 @@
+﻿@model Zaposlen
+
+@{
+    ViewData["Title"] = "Add Zaposlen";
+}
+
+<div class="container mt-4" style="max-width: 50%;">
+    <h3 class="mb-4 text-center">Add New Zaposlen</h3>
+
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <form method="post" asp-action="AddZaposleni">
+                <div class="text-danger mb-3" asp-validation-summary="All"></div>
+
+                <!-- Ime -->
+                <div class="mb-3 row">
+                    <label asp-for="Ime" class="col-sm-3 col-form-label">Ime</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="Ime" class="form-control" placeholder="Unesite ime" />
+                        <span class="text-danger" asp-validation-for="Ime"></span>
+                    </div>
+                </div>
+
+                <!-- Prezime -->
+                <div class="mb-3 row">
+                    <label asp-for="Prezime" class="col-sm-3 col-form-label">Prezime</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="Prezime" class="form-control" placeholder="Unesite prezime" />
+                        <span class="text-danger" asp-validation-for="Prezime"></span>
+                    </div>
+                </div>
+
+                <!-- Roditelj -->
+                <div class="mb-3 row">
+                    <label asp-for="Roditelj" class="col-sm-3 col-form-label">Roditelj</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="Roditelj" class="form-control" placeholder="Unesite ime roditelja" />
+                        <span class="text-danger" asp-validation-for="Roditelj"></span>
+                    </div>
+                </div>
+
+                <!-- Datum Rodjenja -->
+                <div class="mb-3 row">
+                    <label asp-for="DatumRodjenja" class="col-sm-3 col-form-label">Datum Rođenja</label>
+                    <div class="col-sm-9">
+                        <input type="date" asp-for="DatumRodjenja" class="form-control" />
+                        <span class="text-danger" asp-validation-for="DatumRodjenja"></span>
+                    </div>
+                </div>
+
+                <!-- JMBG -->
+                <div class="mb-3 row">
+                    <label asp-for="JMBG" class="col-sm-3 col-form-label">JMBG</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="JMBG" class="form-control" placeholder="Unesite JMBG" />
+                        <span class="text-danger" asp-validation-for="JMBG"></span>
+                    </div>
+                </div>
+
+                <!-- Mesto -->
+                <div class="mb-3 row">
+                    <label asp-for="MestoId" class="col-sm-3 col-form-label">Mesto</label>
+                    <div class="col-sm-9">
+                        @Html.DropDownListFor(
+                                 model => model.MestoId,
+                                 ViewBag.Mesta as SelectList,
+                                 "Izaberite mesto",
+                                 new { @class = "form-control" })
+                        <span class="text-danger" asp-validation-for="MestoId"></span>
+                    </div>
+                </div>
+
+
+                <!-- Adresa -->
+                <div class="mb-3 row">
+                    <label asp-for="Adresa" class="col-sm-3 col-form-label">Adresa</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="Adresa" class="form-control" placeholder="Unesite adresu" />
+                        <span class="text-danger" asp-validation-for="Adresa"></span>
+                    </div>
+                </div>
+                
+                <!-- Telefon -->
+                <div class="mb-3 row">
+                    <label asp-for="Telefon" class="col-sm-3 col-form-label">Telefon</label>
+                    <div class="col-sm-9">
+                        <input type="text" asp-for="Telefon" class="form-control" placeholder="Unesite broj telefona" />
+                        <span class="text-danger" asp-validation-for="Telefon"></span>
+                    </div>
+                </div>
+                
+                <!-- Početak radnog odosa -->
+                <div class="mb-3 row">
+                    <label asp-for="Pocetak_RadnogOd" class="col-sm-3 col-form-label">Početak rada</label>
+                    <div class="col-sm-9">
+                        <input type="date" asp-for="Pocetak_RadnogOd" class="form-control" />
+                        <span class="text-danger" asp-validation-for="Pocetak_RadnogOd"></span>
+                    </div>
+                </div>
+
+                <!-- Kraj radnog odnosa -->
+                <div class="mb-3 row">
+                    <label asp-for="Kraj_RadnogOd" class="col-sm-3 col-form-label">Prestanak rada</label>
+                    <div class="col-sm-9">
+                        <input type="date" asp-for="Kraj_RadnogOd" class="form-control" />
+                        <span class="text-danger" asp-validation-for="Kraj_RadnogOd"></span>
+                    </div>
+                </div>
+
+                <!-- Kvalifikacija -->
+                <div class="mb-3 row">
+                    <label asp-for="KvalifikacijaId" class="col-sm-3 col-form-label">Kvalifikacija</label>
+                    <div class="col-sm-9">
+                        @Html.DropDownListFor(
+                                 model => model.KvalifikacijaId,
+                                 ViewBag.Kvalifikacije as SelectList,
+                                 "Izaberite kvalifikaciju",
+                                 new { @class = "form-control" })
+                        <span class="text-danger" asp-validation-for="KvalifikacijaId"></span>
+                    </div>
+                </div>
+
+                <!-- Vrsta Radnog Odnosa Dropdown -->
+                <div class="mb-3 row">
+                    <label asp-for="Vrsta_RadnogOdnosa" class="col-sm-3 col-form-label">Vrsta Radnog Odnosa</label>
+                    <div class="col-sm-9">
+                        <select asp-for="Vrsta_RadnogOdnosa" class="form-control">
+                            <option value="">--Izaberite vrstu radnog odnosa--</option>
+                            <option value="Privremeni">Privremeni</option>
+                            <option value="Stalni">Stalni</option>
+                            <option value="Honoraran">Honoraran</option>
+                        </select>
+                        <span class="text-danger" asp-validation-for="Vrsta_RadnogOdnosa"></span>
+                    </div>
+                </div>
+
+                <!-- A_P Radio Buttons -->
+                <div class="mb-3 row">
+                    <label class="col-sm-3 col-form-label">A/P</label>
+                    <div class="col-sm-9">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" asp-for="A_P" value="A" id="AOption" />
+                            <label class="form-check-label" for="AOption">A</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" asp-for="A_P" value="P" id="POption" />
+                            <label class="form-check-label" for="POption">P</label>
+                        </div>
+                        <span class="text-danger" asp-validation-for="A_P"></span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mb-3 row">
+                    <div class="col-sm-9 offset-sm-3">
+                        <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                        <button type="button" class="btn btn-secondary btn-block" onclick="indexZaposleni()" style="margin-left: 10px;">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Add Bootstrap validation scripts -->
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial"); // Ovo omogućava da se validacija pokrene odmah, bez slanja forme na server!
+    }
+
+    <script>
+        function indexZaposleni() {
+            window.location.href = '@Url.Action("Index", "Zaposleni")'
+        }
+    </script>
+}

@@ -1,0 +1,190 @@
+﻿@page "/zaposlen/add"
+@rendermode InteractiveServer
+
+@inject ICrudZaposlenUseCases CrudZaposlenUseCases
+@inject NavigationManager NavigationManager
+
+<h3 class="mt-4">Dodaj novog zaposlenog</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+<EditForm Model="zaposlen" OnValidSubmit="Save">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="container-fluid  text-start">
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <label class="form-label">Ime</label>
+                <InputText class="form-control" @bind-Value="zaposlen.Ime" placeholder="Unesite ime" />
+                <ValidationMessage For="@(() => zaposlen.Ime)" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Prezime</label>
+                <InputText class="form-control" @bind-Value="zaposlen.Prezime" placeholder="Unesite prezime" />
+                <ValidationMessage For="@(() => zaposlen.Prezime)" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Ime roditelja</label>
+                <InputText class="form-control" @bind-Value="zaposlen.Roditelj" placeholder="Unesite ime roditelja" />
+                <ValidationMessage For="@(() => zaposlen.Roditelj)" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Datum rođenja</label>
+                <InputDate class="form-control" @bind-Value="zaposlen.DatumRodjenja" />
+                <ValidationMessage For="@(() => zaposlen.DatumRodjenja)" />
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-2">
+                <label class="form-label">JMBG</label>
+                <InputText class="form-control" @bind-Value="zaposlen.JMBG" placeholder="Unesite JMBG" />
+                <ValidationMessage For="@(() => zaposlen.JMBG)" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Početak radnog odnosa</label>
+                <InputDate class="form-control" @bind-Value="zaposlen.Pocetak_RadnogOd" />
+                <ValidationMessage For="@(() => zaposlen.Pocetak_RadnogOd)" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Kraj radnog odnosa</label>
+                <InputDate class="form-control" @bind-Value="zaposlen.Kraj_RadnogOd" />
+                <ValidationMessage For="@(() => zaposlen.Kraj_RadnogOd)" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Vrsta radnog odnosa</label>
+                <InputSelect class="form-control" @bind-Value="zaposlen.Vrsta_RadnogOdnosa">
+                    <option value="">--Izaberite vrstu radnog odnosa--</option>
+                    <option value="Privremeni">Privremeni</option>
+                    <option value="Stalni">Stalni</option>
+                    <option value="Honoraran">Honoraran</option>
+                </InputSelect>
+                <ValidationMessage For="@(() => zaposlen.Vrsta_RadnogOdnosa)" />
+            </div>
+
+            <div class="col-md-1">
+                <label class="form-label">Status (A/P)</label>
+                <InputRadioGroup @bind-Value="zaposlen.A_P" class="d-flex flex-column">
+                    <div class="form-check">
+                        <InputRadio class="form-check-input" Value="@("A")" />
+                        <label class="form-check-label">Aktivan</label>
+                    </div>
+                    <div class="form-check">
+                        <InputRadio class="form-check-input" Value="@("P")" />
+                        <label class="form-check-label">Pasivan</label>
+                    </div>
+                </InputRadioGroup>
+                <ValidationMessage For="@(() => zaposlen.A_P)" />
+            </div>
+
+
+            <div class="col-md-2">
+                <label class="form-label">Telefon</label>
+                <InputText class="form-control" @bind-Value="zaposlen.Telefon" placeholder="Unesite telefon" />
+                <ValidationMessage For="@(() => zaposlen.Telefon)" />
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <label class="form-label">Mesto</label>
+                <InputSelect class="form-control" @bind-Value="zaposlen.MestoId">
+                    <option value="">-- Izaberite mesto --</option>
+                    @foreach (var mesto in listaMesta)
+                    {
+                        <option value="@mesto.Id">@mesto.Naziv</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => zaposlen.MestoId)" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Kvalifikacija</label>
+                <InputSelect class="form-control" @bind-Value="zaposlen.KvalifikacijaId">
+                    <option value="">-- Izaberite kvalifikaciju --</option>
+                    @foreach (var kvalifikacija in listaKvalifikacije)
+                    {
+                        <option value="@kvalifikacija.Id">@kvalifikacija.Naziv</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => zaposlen.KvalifikacijaId)" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Sistematizacija</label>
+                <InputSelect class="form-control" @bind-Value="zaposlen.SistematizacijeId">
+                    <option value="">-- Izaberite sistematizaciju --</option>
+                    @foreach (var sistematizacija in listaSistematizacija)
+                    {
+                        <option value="@sistematizacija.Id">@sistematizacija.NazivRadnogMesta</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => zaposlen.SistematizacijeId)" />
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-12">
+                <button type="submit" class="btn btn-success me-2">Sačuvaj</button>
+                <button type="button" class="btn btn-secondary" @onclick="VratiSeNaListu">Nazad</button>
+            </div>
+        </div>
+    </div>
+
+</EditForm>
+
+@code {
+
+    private Zaposlen zaposlen { get; set; } = new();
+    private List<Mesto> listaMesta = new();
+    private List<Kvalifikacija> listaKvalifikacije = new();
+    private List<Sistematizacija> listaSistematizacija = new();
+
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            listaKvalifikacije = (await CrudZaposlenUseCases.GetAllKvalifikacijeAsync()).ToList();
+            listaMesta = (await CrudZaposlenUseCases.GetAllMestaAsync()).ToList();
+            listaSistematizacija = (await CrudZaposlenUseCases.GetAllSistematizacija()).ToList();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"❌ Greška pri učitavanju kvalifikacija,mesta ili sistematizacija: {ex.Message}";
+            Console.WriteLine($"❌ Izuzetak: {ex}");
+        }
+    }
+
+    private async Task Save()
+    {
+        try
+        {
+            var uspeh = await CrudZaposlenUseCases.AddAsync(zaposlen);
+
+            if (uspeh)
+            {
+                Console.WriteLine($"Uspešno sačuvan zaposlen: {zaposlen.Ime} + ({zaposlen.Roditelj}) + {zaposlen.Prezime}");
+                NavigationManager.NavigateTo("/zaposleni"); // Povratak na listu jedinica
+            }
+            else
+            {
+                errorMessage = "❌ Greška pri čuvanju zaposlenog. Pokušajte ponovo.";
+                Console.WriteLine("❌ Došlo je do greške pri dodavanju zaposlenog.");
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"❌ Neočekivana greška: {ex.Message}";
+            Console.WriteLine($"❌ Izuzetak: {ex}");
+        }
+    }
+
+    private void VratiSeNaListu()
+    {
+        NavigationManager.NavigateTo("/zaposleni");
+    }
+}
